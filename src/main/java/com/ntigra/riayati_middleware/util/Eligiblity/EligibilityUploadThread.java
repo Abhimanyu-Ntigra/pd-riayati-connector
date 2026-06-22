@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.Eligiblity;
 
 import com.ntigra.riayati_middleware.dto.request.EligibilityRequestDto;
-import com.ntigra.riayati_middleware.service.Eligibility.EligibilityService;
+import com.ntigra.riayati_middleware.service.Eligibility.EligibilityServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EligibilityUploadThread implements Runnable {
 
     private final EligibilityRequestDto request;
-    private final EligibilityService eligibilityService;
+    private final EligibilityServiceOld eligibilityService;
 
-    public EligibilityUploadThread(EligibilityRequestDto request, EligibilityService eligibilityService) {
+    public EligibilityUploadThread(EligibilityRequestDto request, EligibilityServiceOld eligibilityService) {
         this.request = request;
         this.eligibilityService = eligibilityService;
     }

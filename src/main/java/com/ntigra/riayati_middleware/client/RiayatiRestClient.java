@@ -2,6 +2,9 @@ package com.ntigra.riayati_middleware.client;
 
 import com.ntigra.riayati_middleware.config.RiayatiProperties;
 import com.ntigra.riayati_middleware.dto.ApiResponseDto;
+import com.ntigra.riayati_middleware.dto.polling.GetNewResponse;
+import com.ntigra.riayati_middleware.dto.polling.SetDownloadedRequest;
+import com.ntigra.riayati_middleware.dto.request.eligibility.response.EligibilityResponse;
 import com.ntigra.riayati_middleware.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -229,18 +232,18 @@ public class RiayatiRestClient {
     /**
      * ELIGIBILITY: Get new Eligibility responses (GET /api/Authorization/GetNew)
      */
-    public ApiResponseDto getNewEligibility() {
-        String url = properties.getBaseUrl() + "/api/Authorization/GetNew";
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                createHttpEntity(),
-                ApiResponseDto.class
-        );
-
-        return response.getBody();
-    }
+//    public ApiResponseDto getNewEligibility() {
+//        String url = properties.getBaseUrl() + "/api/Authorization/GetNew";
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url,
+//                HttpMethod.GET,
+//                createHttpEntity(),
+//                ApiResponseDto.class
+//        );
+//
+//        return response.getBody();
+//    }
 
     /**
      * ELIGIBILITY: View specific Eligibility transaction (GET /api/Authorization/View)
@@ -354,6 +357,7 @@ public class RiayatiRestClient {
         return response.getBody();
     }
 
+<<<<<<< Updated upstream
 
     // ==================== ERX APIs ====================
 
@@ -467,5 +471,101 @@ public class RiayatiRestClient {
         ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
                 url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
         return response.getBody();
+=======
+    /// Eligibility Modifications
+    public String submitEligibility(Object request) {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Object> entity =
+                new HttpEntity<>(request, headers);
+
+        ResponseEntity<String> response =
+                riayatiRestTemplate.exchange(
+                        properties.getBaseUrl()
+                                + "/api/Authorization/PostRequest",
+                        HttpMethod.POST,
+                        entity,
+                        String.class);
+
+        return response.getBody();
+    }
+
+    public GetNewResponse getNewEligibility() {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity =
+                new HttpEntity<>(headers);
+
+        ResponseEntity<GetNewResponse> response =
+                riayatiRestTemplate.exchange(
+                        properties.getBaseUrl()
+                                + "/api/Authorization/GetNew",
+                        HttpMethod.GET,
+                        entity,
+                        GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public EligibilityResponse viewEligibility(
+            String transactionId) {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity =
+                new HttpEntity<>(headers);
+
+        ResponseEntity<EligibilityResponse> response =
+                riayatiRestTemplate.exchange(
+                        properties.getBaseUrl()
+                                + "/api/Authorization/View?id="
+                                + transactionId,
+                        HttpMethod.GET,
+                        entity,
+                        EligibilityResponse.class);
+
+        return response.getBody();
+    }
+
+    public void setDownloaded(
+            String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        SetDownloadedRequest request =
+                new SetDownloadedRequest(
+                        transactionId);
+
+        HttpEntity<SetDownloadedRequest> entity =
+                new HttpEntity<>(request, headers);
+
+        riayatiRestTemplate.exchange(
+                properties.getBaseUrl()
+                        + "/api/Authorization/SetDownloaded",
+                HttpMethod.POST,
+                entity,
+                String.class);
+>>>>>>> Stashed changes
     }
 }

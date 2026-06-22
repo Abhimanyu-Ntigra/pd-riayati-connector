@@ -4,10 +4,14 @@ import com.ntigra.riayati_middleware.dto.request.*;
 import com.ntigra.riayati_middleware.dto.response.*;
 import com.ntigra.riayati_middleware.service.Authorization.AuthorizationService;
 import com.ntigra.riayati_middleware.service.Claim.ClaimService;
+<<<<<<< Updated upstream
 import com.ntigra.riayati_middleware.service.Dispense.DispenseService;
 import com.ntigra.riayati_middleware.service.ERX.ErxService;
 import com.ntigra.riayati_middleware.service.Eligibility.EligibilityService;
 import com.ntigra.riayati_middleware.service.Penalty.PenaltyService;
+=======
+import com.ntigra.riayati_middleware.service.Eligibility.EligibilityServiceOld;
+>>>>>>> Stashed changes
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class RiayatiController {
 
     private final ClaimService claimService;
-    private final EligibilityService eligibilityService;
+    private final EligibilityServiceOld eligibilityService;
     private final AuthorizationService authorizationService;
     private final ErxService erxService;
     private final DispenseService dispenseService;
@@ -31,11 +35,11 @@ public class RiayatiController {
         return claimService.submitClaim(request);
     }
 
-    @PostMapping("/eligibility")
-    public EligibilityResponseDto checkEligibility(@RequestBody EligibilityRequestDto request) {
-        log.info("Received eligibility check request for member: {}", request.getMemberId());
-        return eligibilityService.checkEligibility(request);
-    }
+//    @PostMapping("/eligibility")
+//    public EligibilityResponseDto checkEligibility(@RequestBody EligibilityRequestDto request) {
+//        log.info("Received eligibility check request for member: {}", request.getMemberId());
+//        return eligibilityService.checkEligibility(request);
+//    }
 
     @GetMapping("/eligibility/status/{transactionId}")
     public EligibilityResponseDto getEligibilityStatus(@PathVariable String transactionId) {
