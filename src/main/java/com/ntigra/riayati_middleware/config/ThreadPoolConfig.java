@@ -72,4 +72,70 @@ public class ThreadPoolConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean("erxUploadTaskExecutor")
+    public ThreadPoolTaskExecutor erxUploadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(3);
+        executor.setQueueCapacity(20);
+        executor.setThreadNamePrefix("erx-upload-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean("erxDownloadTaskExecutor")
+    public ThreadPoolTaskExecutor erxDownloadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(10);
+        executor.setThreadNamePrefix("erx-download-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean("dispenseUploadTaskExecutor")
+    public ThreadPoolTaskExecutor dispenseUploadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(3);
+        executor.setQueueCapacity(20);
+        executor.setThreadNamePrefix("dispense-upload-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean("dispenseDownloadTaskExecutor")
+    public ThreadPoolTaskExecutor dispenseDownloadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(10);
+        executor.setThreadNamePrefix("dispense-download-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean("penaltyUploadTaskExecutor")
+    public ThreadPoolTaskExecutor penaltyUploadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(10);
+        executor.setThreadNamePrefix("penalty-upload-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean("penaltyDownloadTaskExecutor")
+    public ThreadPoolTaskExecutor penaltyDownloadTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(5);
+        executor.setThreadNamePrefix("penalty-download-");
+        executor.initialize();
+        return executor;
+    }
 }
