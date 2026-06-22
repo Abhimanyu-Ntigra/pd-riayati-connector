@@ -357,7 +357,7 @@ public class RiayatiRestClient {
         return response.getBody();
     }
 
-<<<<<<< Updated upstream
+
 
     // ==================== ERX APIs ====================
 
@@ -471,7 +471,9 @@ public class RiayatiRestClient {
         ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
                 url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
         return response.getBody();
-=======
+    }
+
+
     /// Eligibility Modifications
     public String submitEligibility(Object request) {
 
@@ -566,6 +568,6 @@ public class RiayatiRestClient {
                 HttpMethod.POST,
                 entity,
                 String.class);
->>>>>>> Stashed changes
+
     }
 }
