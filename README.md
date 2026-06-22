@@ -1,2 +1,2 @@
-# pd-dha-connector
-PD-DHA-Adapter enables secure integration between PowerDoc and Dubai Health Authority (DHA) systems. It handles DHA-specific APIs, data transformation, validation, and transaction processing while ensuring reliable, compliant, and monitored healthcare data exchange.
+# pd-riayati-connector
+PD-RIAYATI-Adapter enables secure integration between PowerDoc and Riayati systems. It handles Riayti-specific APIs, data transformation, validation, and transaction processing while ensuring reliable, compliant, and monitored healthcare data exchange.
