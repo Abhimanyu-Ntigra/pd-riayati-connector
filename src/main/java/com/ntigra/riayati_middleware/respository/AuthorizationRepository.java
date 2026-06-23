@@ -12,6 +12,11 @@ public interface AuthorizationRepository {
     // Update after successful upload
     void updateAuthorizationAsSent(Long id, String entityId);
 
+    /**
+     * Update authorization as SENT with full response JSON
+     */
+    void updateAuthorizationAsSentWithResponse(Long id, String entityId, String responseJson);
+
     // Update as failed
     void updateAuthorizationAsFailed(Long id, String errorMessage);
 
@@ -19,7 +24,8 @@ public interface AuthorizationRepository {
     void updateRetryCount(Long id);
 
     // Update response from payer
-    void updateAuthorizationResponse(String transactionId, String result, String idPayer,
-                                     String denialCode, String startDate, String endDate,
-                                     Double limit, String responseData);
+    void updateAuthorizationResponse(String transactionId, String result, String denialCode,
+                                     String responseComment, String idPayer,
+                                     String startDate, String endDate,
+                                     Double coverageLimit, String responseData);
 }

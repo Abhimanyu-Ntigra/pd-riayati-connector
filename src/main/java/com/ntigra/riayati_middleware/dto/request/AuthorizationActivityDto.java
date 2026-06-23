@@ -14,6 +14,7 @@ public class AuthorizationActivityDto {
     private Double quantity;
     private String unit;
     private Double net;
+    private Double patientShare;
     private String clinician;
     private Double duration;           // For inpatient stays
     private List<ObservationDto> observations;

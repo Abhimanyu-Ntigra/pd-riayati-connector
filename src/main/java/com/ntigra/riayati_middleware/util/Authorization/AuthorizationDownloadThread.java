@@ -1,24 +1,26 @@
 package com.ntigra.riayati_middleware.util.Authorization;
 
 import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
-import com.ntigra.riayati_middleware.scheduler.authorization.AuthorizationDownloadBackgroundService;
+import com.ntigra.riayati_middleware.service.Authorization.AuthorizationService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AuthorizationDownloadThread implements Runnable {
-    private final TransactionEntityDto transaction;
-    private final AuthorizationDownloadBackgroundService downloadService;
 
-    public AuthorizationDownloadThread(TransactionEntityDto transaction,
-                                       AuthorizationDownloadBackgroundService downloadService) {
+    private final TransactionEntityDto transaction;
+    private final AuthorizationService authorizationService;
+
+    public AuthorizationDownloadThread(TransactionEntityDto transaction, AuthorizationService authorizationService) {
         this.transaction = transaction;
-        this.downloadService = downloadService;
+        this.authorizationService = authorizationService;
     }
 
     @Override
     public void run() {
         try {
-            downloadService.processAuthorizationResponse(transaction);
+            log.info("Processing authorization download for transaction: {}", transaction.getId());
+            authorizationService.processAuthorizationResponseInBackground(transaction);
+            log.info("Authorization download completed: {}", transaction.getId());
         } catch (Exception e) {
             log.error("Failed to process authorization download: {}", transaction.getId(), e);
         }

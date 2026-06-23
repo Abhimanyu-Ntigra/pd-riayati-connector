@@ -2,7 +2,7 @@ package com.ntigra.riayati_middleware.scheduler.eligibility;
 
 import com.ntigra.riayati_middleware.dto.request.EligibilityRequestDto;
 import com.ntigra.riayati_middleware.respository.EligibilityRepository;
-import com.ntigra.riayati_middleware.service.Eligibility.EligibilityService;
+import com.ntigra.riayati_middleware.service.Eligibility.EligibilityServiceOld;
 import com.ntigra.riayati_middleware.util.Eligiblity.EligibilityUploadThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +18,12 @@ public class EligibilityUploadScheduler {
 
     private final ThreadPoolTaskExecutor eligibilityUploadTaskExecutor;
     private final EligibilityRepository eligibilityRepository;
-    private final EligibilityService eligibilityService;
+    private final EligibilityServiceOld eligibilityService;
 
     public EligibilityUploadScheduler(
             @Qualifier("eligibilityUploadTaskExecutor") ThreadPoolTaskExecutor eligibilityUploadTaskExecutor,
             EligibilityRepository eligibilityRepository,
-            EligibilityService eligibilityService) {
+            EligibilityServiceOld eligibilityService) {
         this.eligibilityUploadTaskExecutor = eligibilityUploadTaskExecutor;
         this.eligibilityRepository = eligibilityRepository;
         this.eligibilityService = eligibilityService;

@@ -27,6 +27,7 @@ public class AuthorizationRequestDto {
     private String contactNumber;
     private String email;
     private String dateOrdered;
+    private String mrn;
 
     // Encounter Information
     private String facilityId;
@@ -41,4 +42,6 @@ public class AuthorizationRequestDto {
     // Status Tracking
     private Integer retryCount;
     private String status;
+
+    private Double coverageLimit;
 }
