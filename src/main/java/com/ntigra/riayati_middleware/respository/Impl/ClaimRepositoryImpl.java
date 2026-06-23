@@ -15,9 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -186,6 +184,7 @@ public class ClaimRepositoryImpl implements ClaimRepository {
                         "FROM ClaimOrders CO " +
                         "LEFT JOIN Clinicians CLIN ON CLIN.Id = CO.OrderingClinicianId " +
                         "WHERE CO.ClaimId = ? " +
+                        " AND ISNULL(CO.IsDeleted,0) = 0 AND ISNULL(CO.ApprovalStatus, 0) <> 4 AND ISNULL(CO.CoverageStatus, 0) <>2" +
                         "ORDER BY CO.ItemSequenceNo ASC";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -390,5 +389,133 @@ public class ClaimRepositoryImpl implements ClaimRepository {
         jdbcTemplate.update(sql, entityId);
         log.info("Claim with EntityId {} marked as PROCESSED", entityId);
     }
+
+    @Override
+    public void updateRemittance(String claimRef, Double transactionPaidAmount, String paymentDate, String paymentRef, String responseIdentifier, String note){
+
+        try{
+            // get the master remittance by claim ref
+
+            String sql = """
+                        SELECT R.ClaimAmount AS ClaimAmount, R.ClaimId AS ClaimId, R.Id AS  RemittancesID, 
+                        R.RemittancesRef AS RemittancesRef, R.PaidAmount AS PaidAmount
+                        FROM [PowerDoc].[dbo].[Remittances] R
+                        INNER JOIN [PowerDoc].[dbo].[Claims] C ON C.Id = R.ClaimId
+                        WHERE C.ClaimRef = ?
+                        """;
+
+            Map<String, Object> row = jdbcTemplate.query(sql, rs -> {
+                if (rs.next()) {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("RemittancesID", rs.getString("RemittancesID"));
+                    m.put("ClaimAmount", rs.getObject("ClaimAmount"));
+                    m.put("PaidAmount", rs.getObject("PaidAmount"));
+                    m.put("ClaimId", rs.getString("ClaimId"));
+                    m.put("RemittancesRef", rs.getString("RemittancesRef"));
+                    return m;
+                }
+                return null;
+            }, claimRef);
+
+            String remittancesID = row != null ? (String) row.get("RemittancesID") : null;
+            String claimId = row != null ? (String) row.get("ClaimId") : null;
+            Double claimAmount = (row != null && row.get("ClaimAmount") != null)
+                    ? ((Number) row.get("ClaimAmount")).doubleValue() : null;
+            Double paidAmount = (row != null && row.get("PaidAmount") != null)
+                    ? ((Number) row.get("PaidAmount")).doubleValue() : null;
+            String remittancesRef = row != null ? (String) row.get("RemittancesRef") : null;
+
+            Double rejectedAmount = claimAmount;
+            int status = 1;
+
+            // insert into Remittance transaction table
+
+
+            insertRemittanceTransaction(remittancesID, transactionPaidAmount, paymentDate, paymentRef, note, responseIdentifier);
+
+
+            // update Remittance master table    -- status and paid amount
+
+            Double newPaidAmount = (paidAmount != null ? paidAmount : 0.0) + transactionPaidAmount;
+
+            Double newPaidAmountWithOutFess = newPaidAmount;
+            // check Remittance new status
+
+            Double statusResult = newPaidAmountWithOutFess;
+
+            int remittanceStatus = 1;
+            if (statusResult != null && statusResult == 0){
+                remittanceStatus = 4;
+            }
+            if (statusResult != null && statusResult >= claimAmount) {
+                remittanceStatus = 2;
+            }
+            if (statusResult != null && statusResult > 0 && statusResult < claimAmount) {
+                remittanceStatus = 3;
+            }
+
+
+
+            updateRemittanceStatus(remittanceStatus, newPaidAmountWithOutFess, remittancesID);
+
+        } catch (Exception e) {
+            log.error("Error updating remittance record for ClaimRef: {}", claimRef, e);
+            throw new RuntimeException("Failed to update remittance record", e);
+        }
+    }
+
+    @Override
+    public void updateRemittanceStatus(int status, Double paidAmount, String remittancesId) {
+        String sql = """
+        UPDATE R 
+        SET R.Status = ?,
+            R.PaidAmount = ?,
+            R.UpdatedAt = GETDATE(),
+            R.UpdatedBy = 1
+        FROM [PowerDoc].[dbo].[Remittances] R
+        WHERE R.Id = ?
+        """;
+
+        try {
+            int result = jdbcTemplate.update(sql, status, paidAmount, remittancesId);
+            log.info("Updated remittance status to {} for ClaimRef: {}, RemittancesRef: {}. Rows affected: {}",
+                    status, result);
+        } catch (Exception e) {
+            log.error("Error updating remittance status for remittancesId: {}", remittancesId, e);
+            throw new RuntimeException("Failed to update remittance status", e);
+        }
+    }
+
+    @Override
+    public void insertRemittanceTransaction(
+            String RemittanceId, Double paidAmount,
+            String paymentDate, String paymentRef, String note, String responseIdentifier) {
+
+        String sql = """
+            INSERT INTO [PowerDoc].[dbo].[RemittancesPaymentTransaction]
+            (Id, RemittanceId, PaidAmount, PaymentDate, PaymentRef, Note, CreatedAt, CreatedBy,UpdatedAt,UpdatedBy, IsDeleted, ResponseIdentifier)
+            VALUES (?, ?, ?, ?, ?, ?, GETDATE(),1,GETDATE(),1, 0, ?)
+            """;
+
+        try {
+            UUID id = UUID.randomUUID();
+
+            int result = jdbcTemplate.update(sql,
+                    id.toString(),
+                    RemittanceId,
+                    paidAmount,
+                    paymentDate,
+                    paymentRef,
+                    note,
+                    responseIdentifier
+            );
+
+            log.info("Inserted remittance record. Rows affected: {}", result);
+
+        } catch (Exception e) {
+            log.error("SQL Error Details:", e);
+        }
+    }
+
 
 }

@@ -16,5 +16,6 @@ public class ActivityDetail {
     private String code;
     private Double paymentAmount;
     private String denialCode;
+    private String comments;
 
 }

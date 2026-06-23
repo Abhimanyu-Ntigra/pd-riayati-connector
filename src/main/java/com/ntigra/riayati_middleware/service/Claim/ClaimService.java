@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ntigra.riayati_middleware.client.RiayatiRestClient;
 import com.ntigra.riayati_middleware.dto.ApiResponseDto;
 import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
+import com.ntigra.riayati_middleware.dto.entity.Claim.ActivityDetail;
 import com.ntigra.riayati_middleware.dto.entity.Claim.ClaimSubmission;
 import com.ntigra.riayati_middleware.dto.entity.Claim.RemittanceData;
 import com.ntigra.riayati_middleware.dto.request.ClaimRequestDto;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -217,12 +219,21 @@ public class ClaimService {
             // Step 3: Update database with payment info
             if (remittanceData.getClaimId() != null) {
                 String remittanceJson = objectMapper.writeValueAsString(viewResponse);
-                claimRepository.updatePaymentInfo(
+                /*claimRepository.updatePaymentInfo(
                         remittanceData.getClaimId(),
                         remittanceData.getTotalPaymentAmount(),
                         remittanceData.getPaymentReference(),
                         remittanceData.getDenialCode(),
                         remittanceJson
+                );*/
+
+                claimRepository.updateRemittance(
+                        remittanceData.getClaimId(),
+                        remittanceData.getTotalPaymentAmount(),
+                        remittanceData.getDateSettlement(),
+                        remittanceData.getPaymentReference(),
+                        remittanceData.getPaymentReference(),
+                        remittanceData.getDenialCode()
                 );
                 log.info("Payment updated for claim: {}, amount: {}",
                         remittanceData.getClaimId(), remittanceData.getTotalPaymentAmount());
@@ -270,6 +281,7 @@ public class ClaimService {
             double totalGross = 0.0;
             double totalPatientShare = 0.0;
 
+            data.setActivityDetails(new ArrayList<ActivityDetail>());
             if (activitiesNode.isArray()) {
                 for (JsonNode activity : activitiesNode) {
                     double paymentAmount = activity.path("PaymentAmount").asDouble(0.0);
@@ -280,6 +292,14 @@ public class ClaimService {
                     totalGross += gross;
                     totalPatientShare += patientShare;
 
+                    ActivityDetail activityDetail = new ActivityDetail();
+                    activityDetail.setPaymentAmount(activity.path("PaymentAmount").asDouble(0.0));
+                    activityDetail.setActivityId(activity.path("ID").asText(null));
+                    activityDetail.setCode(activity.path("Code").asText(null));
+                    activityDetail.setDenialCode(activity.path("DenialCode").asText(null));
+                    activityDetail.setCode(activity.path("Comments").asText(null));
+
+                    data.getActivityDetails().add(activityDetail);
                     // Store activity level details if needed
 //                    data.addActivityDetail(
 //                            activity.path("ID").asText(null),

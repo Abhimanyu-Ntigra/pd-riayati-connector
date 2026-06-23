@@ -41,4 +41,9 @@ public interface ClaimRepository {
 
     // Mark claim as processed after payment received
     void markAsProcessed(String entityId);
+
+    void updateRemittance(String claimRef, Double transactionPaidAmount, String paymentDate, String paymentRef, String responseIdentifier, String note);
+    void updateRemittanceStatus(int status, Double paidAmount, String remittancesId);
+    void insertRemittanceTransaction(String RemittanceId, Double paidAmount,
+                                     String paymentDate, String paymentRef, String note, String responseIdentifier);
 }
