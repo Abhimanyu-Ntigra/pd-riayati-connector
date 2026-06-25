@@ -1,6 +1,5 @@
 package com.ntigra.riayati_middleware.respository.Impl;
 
-import com.ntigra.riayati_middleware.dto.request.DiagnosisDto;
 import com.ntigra.riayati_middleware.dto.request.EligibilityActivityDto;
 import com.ntigra.riayati_middleware.dto.request.EligibilityRequestDto;
 import com.ntigra.riayati_middleware.respository.EligibilityRepository;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository

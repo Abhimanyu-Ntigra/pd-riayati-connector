@@ -1,6 +1,8 @@
 package com.ntigra.riayati_middleware.respository.Impl;
 
 import com.ntigra.riayati_middleware.dto.request.*;
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.DiagnosisDto;
+import com.ntigra.riayati_middleware.dto.request.erx.response.ErxActivityResponse;
 import com.ntigra.riayati_middleware.respository.ErxRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -158,17 +160,101 @@ public class ErxRepositoryImpl implements ErxRepository {
         jdbcTemplate.update(sql, id);
     }
 
+
+    //PreAuthOrders   DenialCode is for PreAuthOrders
+//    @Override
+//    public void updateErxResponse(String prescriptionId, String result, String idPayer,
+//                                  String denialCode, String startDate, String endDate,
+//                                  Double limit, String responseData) {
+//        String sql =
+//                "UPDATE PreAuthHead " +
+//                        "SET Result = ?, IdPayer = ?, DenialCode = ?, " +
+//                        "    StartDate = ?, EndDate = ?, CoverageLimit = ?, " +
+//                        "    ResponseData = ?, Status = 4, ProcessedAt = GETDATE() " +
+//                        "WHERE PreAuthRef = ?";
+//        jdbcTemplate.update(sql, result, idPayer, denialCode, startDate, endDate, limit,
+//                responseData, prescriptionId);
+//    }
+
     @Override
-    public void updateErxResponse(String prescriptionId, String result, String idPayer,
-                                  String denialCode, String startDate, String endDate,
-                                  Double limit, String responseData) {
+    public void updateErxOrders(String preAuthRef, ErxActivityResponse item) {
+        try {
+            Integer approvalStatus = 2;
+            Double netAmount = 0.0;
+            Double paymentAmount = 0.0;
+
+            if (item.getNet() != null && item.getPaymentAmount() != null) {
+                netAmount = item.getNet();
+                paymentAmount = item.getPaymentAmount();
+
+                if (netAmount.equals(paymentAmount)) {
+                    approvalStatus = 3;
+                } else if (netAmount > paymentAmount && paymentAmount > 0) {
+                    approvalStatus = 2;
+                } else if (paymentAmount == 0) {
+                    approvalStatus = 4;
+                }
+            } else if (item.getPaymentAmount() == null || item.getPaymentAmount() == 0) {
+                approvalStatus = 4;
+            }
+
+            String denialCode = item.getDenialCode();
+            Integer denialCodeId = null;
+
+            if (denialCode != null && !denialCode.isEmpty()) {
+                try {
+                    String sql = "SELECT TOP 1 Id FROM DenialCodes WHERE DenialCode = ?";
+                    denialCodeId = jdbcTemplate.queryForObject(sql, Integer.class, denialCode);
+                } catch (Exception e) {
+                    log.warn("DenialCode not found: {}", denialCode);
+                }
+            }
+
+            String updateSql =
+                    "UPDATE PAO " +
+                            "SET PAO.ApprovedAmount = ?, " +
+                            "    PAO.ApprovalStatus = ?, " +
+                            "    PAO.DenialCode = ?, " +
+                            "    PAO.UpdatedAt = GETDATE() " +
+                            "FROM PreAuthOrders PAO " +
+                            "INNER JOIN PreAuthHead PH ON PAO.PreAuthId = PH.Id " +
+                            "WHERE PH.PreAuthRef = ? " +
+                            "  AND PAO.ServiceCode = ?";
+
+            jdbcTemplate.update(
+                    updateSql,
+                    paymentAmount,
+                    approvalStatus,
+                    denialCodeId,
+                    preAuthRef,
+                    item.getCode()
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update ErxOrders", e);
+        }
+    }
+
+    @Override
+    public void updateErxStatus(String preAuthRef, Integer status, Integer isProceed) {
         String sql =
                 "UPDATE PreAuthHead " +
-                        "SET Result = ?, IdPayer = ?, DenialCode = ?, " +
-                        "    StartDate = ?, EndDate = ?, CoverageLimit = ?, " +
-                        "    ResponseData = ?, Status = 4, ProcessedAt = GETDATE() " +
+                        "SET Status = ?, " +
+                        "    IsProceed = ?, " +
+                        "    UpdatedAt = GETDATE() " +
                         "WHERE PreAuthRef = ?";
-        jdbcTemplate.update(sql, result, idPayer, denialCode, startDate, endDate, limit,
-                responseData, prescriptionId);
+        jdbcTemplate.update(sql, status, isProceed, preAuthRef);
+    }
+
+    @Override
+    public String findPreAuthHeadIdByPreAuthRef(String preAuthRef) {
+        String preAuthId = null;
+        try {
+            String sql = "SELECT TOP 1 Id FROM PreAuthHead WHERE PreAuthRef = ?";
+            preAuthId = jdbcTemplate.queryForObject(sql, String.class, preAuthRef);
+        } catch (Exception e) {
+            log.warn("PreAuthRef not found: {}", preAuthRef);
+        }
+        return preAuthId;
     }
 }

@@ -1,11 +1,9 @@
 package com.ntigra.riayati_middleware.scheduler.authorization;
 
 import com.ntigra.riayati_middleware.client.RiayatiRestClient;
-import com.ntigra.riayati_middleware.dto.ApiResponseDto;
-import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
 import com.ntigra.riayati_middleware.dto.request.AuthorizationRequestDto;
 import com.ntigra.riayati_middleware.respository.AuthorizationRepository;
-import com.ntigra.riayati_middleware.service.Authorization.AuthorizationService;
+import com.ntigra.riayati_middleware.service.Authorization.AuthorizationServiceOld;
 import com.ntigra.riayati_middleware.util.Authorization.AuthorizationUploadThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,13 +20,13 @@ public class AuthorizationUploadScheduler {
     private final ThreadPoolTaskExecutor authorizationUploadTaskExecutor;
     private final RiayatiRestClient riayatiClient;
     private final AuthorizationRepository authorizationRepository;
-    private final AuthorizationService authorizationService;
+    private final AuthorizationServiceOld authorizationService;
 
     public AuthorizationUploadScheduler(
             @Qualifier("authorizationUploadTaskExecutor") ThreadPoolTaskExecutor authorizationUploadTaskExecutor,
             RiayatiRestClient riayatiClient,
             AuthorizationRepository authorizationRepository,
-            AuthorizationService authorizationService) {
+            AuthorizationServiceOld authorizationService) {
         this.authorizationUploadTaskExecutor = authorizationUploadTaskExecutor;
         this.riayatiClient = riayatiClient;
         this.authorizationRepository = authorizationRepository;

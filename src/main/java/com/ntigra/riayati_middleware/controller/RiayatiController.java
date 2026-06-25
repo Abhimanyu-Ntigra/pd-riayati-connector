@@ -1,19 +1,24 @@
 package com.ntigra.riayati_middleware.controller;
 
-import com.ntigra.riayati_middleware.dto.request.*;
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.AuthorizationRequestDto;
+import com.ntigra.riayati_middleware.dto.request.ClaimRequestDto;
+import com.ntigra.riayati_middleware.dto.request.dispense.request.DispenseRequestDto;
+import com.ntigra.riayati_middleware.dto.request.erx.request.ErxRequestDto;
+import com.ntigra.riayati_middleware.dto.request.penality.request.PenaltyRequestDto;
 import com.ntigra.riayati_middleware.dto.response.*;
 import com.ntigra.riayati_middleware.service.Authorization.AuthorizationService;
 import com.ntigra.riayati_middleware.service.Claim.ClaimService;
 
 import com.ntigra.riayati_middleware.service.Dispense.DispenseService;
 import com.ntigra.riayati_middleware.service.ERX.ErxService;
-import com.ntigra.riayati_middleware.service.Eligibility.EligibilityService;
 import com.ntigra.riayati_middleware.service.Penalty.PenaltyService;
+import com.ntigra.riayati_middleware.service.Penalty.PenaltyServiceOld;
 
 import com.ntigra.riayati_middleware.service.Eligibility.EligibilityServiceOld;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -52,79 +57,58 @@ public class RiayatiController {
     }
 
     @PostMapping("/authorization")
-    public AuthorizationResponseDto sendAuthorization(@RequestBody AuthorizationRequestDto request) {
-        return authorizationService.sendAuthorization(request);
+    public ResponseEntity<?> sendAuthorization(@RequestBody AuthorizationRequestDto request) {
+        log.info("POST /authorization - Sending authorization for member: {}", request.getMemberId());
+        return ResponseEntity.ok(authorizationService.submit(request));
     }
 
     @GetMapping("/authorization/status/{transactionId}")
-    public AuthorizationResponseDto getAuthorizationStatus(@PathVariable String transactionId) {
-        // Implementation
-        return AuthorizationResponseDto.builder().success(true).build();
+    public ResponseEntity<?> getAuthorizationStatus(@PathVariable String transactionId) {
+        log.info("GET /authorization/status - Getting status for: {}", transactionId);
+        return ResponseEntity.ok(authorizationService.getStatus(transactionId));
     }
+
 
     // ==================== ERX ====================
 
     @PostMapping("/erx")
-    public ErxResponseDto submitErx(@RequestBody ErxRequestDto request) {
-        log.info("Received ERX request for: {}", request.getPrescriptionId());
-        return erxService.sendErxRequest(request);
-    }
-
-    @PostMapping("/erx/cancel")
-    public ErxResponseDto cancelErx(@RequestBody ErxRequestDto request) {
-        log.info("Received ERX cancellation request for: {}", request.getPrescriptionId());
-        request.setTransactionType("eRxCancellation");
-        return erxService.sendErxRequest(request);
+    public ResponseEntity<?> submitErx(@RequestBody ErxRequestDto request) {
+        log.info("POST /erx - Submitting ERX: {}", request.getPrescriptionId());
+        return ResponseEntity.ok(erxService.submit(request));
     }
 
     @GetMapping("/erx/status/{prescriptionId}")
-    public ErxResponseDto getErxStatus(@PathVariable String prescriptionId) {
-        log.info("Getting ERX status for: {}", prescriptionId);
-        return ErxResponseDto.builder()
-                .success(true)
-                .message("Status retrieved")
-                .build();
+    public ResponseEntity<?> getErxStatus(@PathVariable String prescriptionId) {
+        log.info("GET /erx/status - Getting status for: {}", prescriptionId);
+        return ResponseEntity.ok(erxService.getStatus(prescriptionId));
     }
 
     // ==================== DISPENSE ====================
 
     @PostMapping("/dispense")
-    public DispenseResponseDto submitDispense(@RequestBody DispenseRequestDto request) {
-        log.info("Received dispense request for: {}", request.getDispenseId());
-        return dispenseService.sendDispense(request);
-    }
-
-    @PostMapping("/dispense/process-flow/{dispenseId}")
-    public String processCompletePharmacyFlow(@PathVariable String dispenseId) {
-        log.info("Processing complete pharmacy flow for: {}", dispenseId);
-        dispenseService.processCompletePharmacyFlow(dispenseId);
-        return "Pharmacy flow completed for dispense: " + dispenseId;
+    public ResponseEntity<?> submitDispense(@RequestBody DispenseRequestDto request) {
+        log.info("POST /dispense - Submitting dispense: {}", request.getDispenseId());
+        return ResponseEntity.ok(dispenseService.submit(request));
     }
 
     @GetMapping("/dispense/status/{dispenseId}")
-    public DispenseResponseDto getDispenseStatus(@PathVariable String dispenseId) {
-        log.info("Getting dispense status for: {}", dispenseId);
-        return DispenseResponseDto.builder()
-                .success(true)
-                .message("Status retrieved")
-                .build();
+    public ResponseEntity<?> getDispenseStatus(@PathVariable String dispenseId) {
+        log.info("GET /dispense/status - Getting status for: {}", dispenseId);
+        return ResponseEntity.ok(dispenseService.getStatus(dispenseId));
     }
 
     // ==================== PENALTY ====================
 
     @PostMapping("/penalty")
-    public PenaltyResponseDto submitPenalty(@RequestBody PenaltyRequestDto request) {
-        log.info("Received penalty request for claim: {}", request.getClaimId());
-        return penaltyService.sendPenalty(request);
+    public ResponseEntity<?> submitPenalty(@RequestBody PenaltyRequestDto request) {
+        log.info("POST /penalty - Submitting penalty for claim: {}", request.getClaimId());
+        return ResponseEntity.ok(penaltyService.submit(request));
     }
 
     @GetMapping("/penalty/status/{claimId}")
-    public PenaltyResponseDto getPenaltyStatus(@PathVariable String claimId) {
-        log.info("Getting penalty status for claim: {}", claimId);
-        return PenaltyResponseDto.builder()
-                .success(true)
-                .message("Status retrieved")
-                .build();
+    public ResponseEntity<?> getPenaltyStatus(@PathVariable String claimId) {
+        log.info("GET /penalty/status - Getting status for claim: {}", claimId);
+        return ResponseEntity.ok(penaltyService.getStatus(claimId));
     }
 
 }

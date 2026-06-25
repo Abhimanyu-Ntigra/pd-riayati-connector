@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.Penalty;
 
 import com.ntigra.riayati_middleware.dto.request.PenaltyRequestDto;
-import com.ntigra.riayati_middleware.service.Penalty.PenaltyService;
+import com.ntigra.riayati_middleware.service.Penalty.PenaltyServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PenaltyUploadThread implements Runnable {
 
     private final PenaltyRequestDto request;
-    private final PenaltyService penaltyService;
+    private final PenaltyServiceOld penaltyService;
 
-    public PenaltyUploadThread(PenaltyRequestDto request, PenaltyService penaltyService) {
+    public PenaltyUploadThread(PenaltyRequestDto request, PenaltyServiceOld penaltyService) {
         this.request = request;
         this.penaltyService = penaltyService;
     }

@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.ERX;
 
 import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
-import com.ntigra.riayati_middleware.service.ERX.ErxService;
+import com.ntigra.riayati_middleware.service.ERX.ErxServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ErxDownloadThread implements Runnable {
 
     private final TransactionEntityDto transaction;
-    private final ErxService erxService;
+    private final ErxServiceOld erxService;
 
-    public ErxDownloadThread(TransactionEntityDto transaction, ErxService erxService) {
+    public ErxDownloadThread(TransactionEntityDto transaction, ErxServiceOld erxService) {
         this.transaction = transaction;
         this.erxService = erxService;
     }

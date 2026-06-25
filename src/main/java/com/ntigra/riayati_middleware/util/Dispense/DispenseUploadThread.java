@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.Dispense;
 
 import com.ntigra.riayati_middleware.dto.request.DispenseRequestDto;
-import com.ntigra.riayati_middleware.service.Dispense.DispenseService;
+import com.ntigra.riayati_middleware.service.Dispense.DispenseServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DispenseUploadThread implements Runnable {
 
     private final DispenseRequestDto request;
-    private final DispenseService dispenseService;
+    private final DispenseServiceOld dispenseService;
 
-    public DispenseUploadThread(DispenseRequestDto request, DispenseService dispenseService) {
+    public DispenseUploadThread(DispenseRequestDto request, DispenseServiceOld dispenseService) {
         this.request = request;
         this.dispenseService = dispenseService;
     }

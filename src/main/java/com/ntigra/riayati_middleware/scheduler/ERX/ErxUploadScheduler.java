@@ -2,7 +2,7 @@ package com.ntigra.riayati_middleware.scheduler.ERX;
 
 import com.ntigra.riayati_middleware.dto.request.ErxRequestDto;
 import com.ntigra.riayati_middleware.respository.ErxRepository;
-import com.ntigra.riayati_middleware.service.ERX.ErxService;
+import com.ntigra.riayati_middleware.service.ERX.ErxServiceOld;
 import com.ntigra.riayati_middleware.util.ERX.ErxUploadThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +18,12 @@ public class ErxUploadScheduler {
 
     private final ThreadPoolTaskExecutor erxUploadTaskExecutor;
     private final ErxRepository erxRepository;
-    private final ErxService erxService;
+    private final ErxServiceOld erxService;
 
     public ErxUploadScheduler(
             @Qualifier("erxUploadTaskExecutor") ThreadPoolTaskExecutor erxUploadTaskExecutor,
             ErxRepository erxRepository,
-            ErxService erxService) {
+            ErxServiceOld erxService) {
         this.erxUploadTaskExecutor = erxUploadTaskExecutor;
         this.erxRepository = erxRepository;
         this.erxService = erxService;

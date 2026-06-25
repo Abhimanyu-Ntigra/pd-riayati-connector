@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.Authorization;
 
 import com.ntigra.riayati_middleware.dto.request.AuthorizationRequestDto;
-import com.ntigra.riayati_middleware.service.Authorization.AuthorizationService;
+import com.ntigra.riayati_middleware.service.Authorization.AuthorizationServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AuthorizationUploadThread implements Runnable {
 
     private final AuthorizationRequestDto request;
-    private final AuthorizationService authorizationService;
+    private final AuthorizationServiceOld authorizationService;
 
-    public AuthorizationUploadThread(AuthorizationRequestDto request, AuthorizationService authorizationService) {
+    public AuthorizationUploadThread(AuthorizationRequestDto request, AuthorizationServiceOld authorizationService) {
         this.request = request;
         this.authorizationService = authorizationService;
     }

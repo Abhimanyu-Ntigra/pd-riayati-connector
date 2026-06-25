@@ -2,7 +2,7 @@ package com.ntigra.riayati_middleware.scheduler.Penalty;
 
 import com.ntigra.riayati_middleware.dto.request.PenaltyRequestDto;
 import com.ntigra.riayati_middleware.respository.PenaltyRepository;
-import com.ntigra.riayati_middleware.service.Penalty.PenaltyService;
+import com.ntigra.riayati_middleware.service.Penalty.PenaltyServiceOld;
 import com.ntigra.riayati_middleware.util.Penalty.PenaltyUploadThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +18,12 @@ public class PenaltyUploadScheduler {
 
     private final ThreadPoolTaskExecutor penaltyUploadTaskExecutor;
     private final PenaltyRepository penaltyRepository;
-    private final PenaltyService penaltyService;
+    private final PenaltyServiceOld penaltyService;
 
     public PenaltyUploadScheduler(
             @Qualifier("penaltyUploadTaskExecutor") ThreadPoolTaskExecutor penaltyUploadTaskExecutor,
             PenaltyRepository penaltyRepository,
-            PenaltyService penaltyService) {
+            PenaltyServiceOld penaltyService) {
         this.penaltyUploadTaskExecutor = penaltyUploadTaskExecutor;
         this.penaltyRepository = penaltyRepository;
         this.penaltyService = penaltyService;

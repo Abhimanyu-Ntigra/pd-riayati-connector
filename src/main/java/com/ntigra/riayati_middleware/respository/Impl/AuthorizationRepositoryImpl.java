@@ -1,17 +1,16 @@
 package com.ntigra.riayati_middleware.respository.Impl;
 
-import com.ntigra.riayati_middleware.dto.request.AuthorizationActivityDto;
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.AuthorizationActivityDto;
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.DiagnosisDto;
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.ObservationDto;
+import com.ntigra.riayati_middleware.dto.request.Authorization.response.Activity;
 import com.ntigra.riayati_middleware.dto.request.AuthorizationRequestDto;
-import com.ntigra.riayati_middleware.dto.request.DiagnosisDto;
-import com.ntigra.riayati_middleware.dto.request.ObservationDto;
 import com.ntigra.riayati_middleware.respository.AuthorizationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Repository
@@ -220,27 +219,116 @@ public class AuthorizationRepositoryImpl implements AuthorizationRepository {
         log.info("Authorization {} retry count incremented", id);
     }
 
+//    @Override
+//    public void updateAuthorizationResponse(String transactionId, String result, String denialCode,
+//                                            String responseComment, String idPayer,
+//                                            String startDate, String endDate,
+//                                            Double coverageLimit, String responseData) {
+//        String sql =
+//                "UPDATE PreAuthHead " +
+//                        "SET Result = ?, " +
+//                        "    DenialCode = ?, " +    //Order table
+//                        "    ResponseComment = ?, " +
+//                        "    IdPayer = ?, " +
+//                        "    StartDate = ?, " +
+//                        "    EndDate = ?, " +
+//                        "    ClaimAmount = ?, " +
+//                        "    ResponseData = ?, " +
+//                        "    Status = 4, " +
+//                        "    ProcessedAt = GETDATE() " +
+//                        "WHERE PreAuthRef = ?";
+//
+//        jdbcTemplate.update(sql, result, denialCode, responseComment, idPayer,
+//                startDate, endDate, coverageLimit, responseData, transactionId);
+//        log.info("Authorization response updated for: {}, Result: {}", transactionId, result);
+//    }
+
     @Override
-    public void updateAuthorizationResponse(String transactionId, String result, String denialCode,
-                                            String responseComment, String idPayer,
-                                            String startDate, String endDate,
-                                            Double coverageLimit, String responseData) {
+    public void updatePreAuthOrder(String preAuthRef, Activity item) {
+        try {
+            Integer approvalStatus = 2;
+            Double netAmount = 0.0;
+            Double paymentAmount = 0.0;
+
+            if (item.getNet() != null && item.getPaymentAmount() != null) {
+                netAmount = item.getNet();
+                paymentAmount = item.getPaymentAmount();
+
+                if (netAmount.equals(paymentAmount)) {
+                    approvalStatus = 3;
+                } else if (netAmount > paymentAmount && paymentAmount > 0) {
+                    approvalStatus = 2;
+                } else if (paymentAmount == 0) {
+                    approvalStatus = 4;
+                }
+            } else if (item.getPaymentAmount() == null || item.getPaymentAmount() == 0) {
+                approvalStatus = 4;
+            }
+
+            String denialCode = item.getDenialCode();
+            Integer denialCodeId = null;
+
+            if (denialCode != null && !denialCode.isEmpty()) {
+                try {
+                    String sql = "SELECT TOP 1 Id FROM DenialCodes WHERE DenialCode = ?";
+                    denialCodeId = jdbcTemplate.queryForObject(sql, Integer.class, denialCode);
+                } catch (Exception e) {
+                    log.warn("DenialCode not found: {}", denialCode);
+                }
+            }
+
+            String updateSql =
+                    "UPDATE PAO " +
+                            "SET PAO.ApprovedAmount = ?, " +
+                            "    PAO.ApprovalStatus = ?, " +
+                            "    PAO.DenialCode = ?, " +
+                            "    PAO.UpdatedAt = GETDATE() " +
+                            "FROM PreAuthOrders PAO " +
+                            "INNER JOIN PreAuthHead PH ON PAO.PreAuthId = PH.Id " +
+                            "WHERE PH.PreAuthRef = ? " +
+                            "  AND PAO.ServiceCode = ?";
+
+            jdbcTemplate.update(
+                    updateSql,
+                    paymentAmount,
+                    approvalStatus,
+                    denialCodeId,
+                    preAuthRef,
+                    item.getCode()
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update PreAuthOrders", e);
+        }
+    }
+
+    @Override
+    public void updatePreAuthStatus(String preAuthRef, Integer status, Integer isProceed) {
         String sql =
                 "UPDATE PreAuthHead " +
-                        "SET Result = ?, " +
-                        "    DenialCode = ?, " +
-                        "    ResponseComment = ?, " +
-                        "    IdPayer = ?, " +
-                        "    StartDate = ?, " +
-                        "    EndDate = ?, " +
-                        "    ClaimAmount = ?, " +
-                        "    ResponseData = ?, " +
-                        "    Status = 4, " +
-                        "    ProcessedAt = GETDATE() " +
+                        "SET Status = ?, " +
+                        "    IsProceed = ?, " +
+                        "    UpdatedAt = GETDATE() " +
                         "WHERE PreAuthRef = ?";
+        jdbcTemplate.update(sql, status, isProceed, preAuthRef);
+        log.info("Updated PreAuthHead status to {}, IsProceed: {} for PreAuthRef: {}", status, isProceed, preAuthRef);
+    }
 
-        jdbcTemplate.update(sql, result, denialCode, responseComment, idPayer,
-                startDate, endDate, coverageLimit, responseData, transactionId);
-        log.info("Authorization response updated for: {}, Result: {}", transactionId, result);
+    @Override
+    public String findPreAuthHeadIdByPreAuthRef(String preAuthRef) {
+        String sql = "SELECT Id FROM PreAuthHead WHERE PreAuthRef = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, String.class, preAuthRef);
+        } catch (Exception e) {
+            log.error("PreAuthHead not found for PreAuthRef: {}", preAuthRef);
+            return null;
+        }
+    }
+
+    @Override
+    public void updateBillStatus(String preAuthId) {
+        String sql = "UPDATE PreAuthHead SET BillStatus = 'PROCESSED' WHERE Id = ?";
+        jdbcTemplate.update(sql, preAuthId);
+        log.info("Bill status updated for PreAuthId: {}", preAuthId);
     }
 }

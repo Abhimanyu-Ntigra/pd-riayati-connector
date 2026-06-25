@@ -1,16 +1,16 @@
 package com.ntigra.riayati_middleware.util.Penalty;
 
 import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
-import com.ntigra.riayati_middleware.service.Penalty.PenaltyService;
+import com.ntigra.riayati_middleware.service.Penalty.PenaltyServiceOld;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PenaltyDownloadThread implements Runnable {
 
     private final TransactionEntityDto transaction;
-    private final PenaltyService penaltyService;
+    private final PenaltyServiceOld penaltyService;
 
-    public PenaltyDownloadThread(TransactionEntityDto transaction, PenaltyService penaltyService) {
+    public PenaltyDownloadThread(TransactionEntityDto transaction, PenaltyServiceOld penaltyService) {
         this.transaction = transaction;
         this.penaltyService = penaltyService;
     }

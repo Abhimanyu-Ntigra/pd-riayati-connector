@@ -2,7 +2,7 @@ package com.ntigra.riayati_middleware.scheduler.Dispense;
 
 import com.ntigra.riayati_middleware.dto.request.DispenseRequestDto;
 import com.ntigra.riayati_middleware.respository.DispenseRepository;
-import com.ntigra.riayati_middleware.service.Dispense.DispenseService;
+import com.ntigra.riayati_middleware.service.Dispense.DispenseServiceOld;
 import com.ntigra.riayati_middleware.util.Dispense.DispenseUploadThread;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +18,12 @@ public class DispenseUploadScheduler {
 
     private final ThreadPoolTaskExecutor dispenseUploadTaskExecutor;
     private final DispenseRepository dispenseRepository;
-    private final DispenseService dispenseService;
+    private final DispenseServiceOld dispenseService;
 
     public DispenseUploadScheduler(
             @Qualifier("dispenseUploadTaskExecutor") ThreadPoolTaskExecutor dispenseUploadTaskExecutor,
             DispenseRepository dispenseRepository,
-            DispenseService dispenseService) {
+            DispenseServiceOld dispenseService) {
         this.dispenseUploadTaskExecutor = dispenseUploadTaskExecutor;
         this.dispenseRepository = dispenseRepository;
         this.dispenseService = dispenseService;

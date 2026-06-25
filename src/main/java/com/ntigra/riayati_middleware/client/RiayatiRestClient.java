@@ -4,7 +4,11 @@ import com.ntigra.riayati_middleware.config.RiayatiProperties;
 import com.ntigra.riayati_middleware.dto.ApiResponseDto;
 import com.ntigra.riayati_middleware.dto.polling.GetNewResponse;
 import com.ntigra.riayati_middleware.dto.polling.SetDownloadedRequest;
+import com.ntigra.riayati_middleware.dto.request.Authorization.response.AuthorizationResponse;
+import com.ntigra.riayati_middleware.dto.request.dispense.response.DispenseResponse;
 import com.ntigra.riayati_middleware.dto.request.eligibility.response.EligibilityResponse;
+import com.ntigra.riayati_middleware.dto.request.erx.response.ErxResponse;
+import com.ntigra.riayati_middleware.dto.request.penality.response.PenaltyResponse;
 import com.ntigra.riayati_middleware.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -289,189 +293,189 @@ public class RiayatiRestClient {
     /**
      * AUTHORIZATION: Send Authorization Request (POST /api/Authorization/PostRequest)
      */
-    public ApiResponseDto postAuthorizationRequest(Map<String, Object> requestBody) {
-        String url = properties.getBaseUrl() + "/api/Authorization/PostRequest";
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                createHttpEntity(requestBody),
-                ApiResponseDto.class
-        );
-
-        return response.getBody();
-    }
+//    public ApiResponseDto postAuthorizationRequest(Map<String, Object> requestBody) {
+//        String url = properties.getBaseUrl() + "/api/Authorization/PostRequest";
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url,
+//                HttpMethod.POST,
+//                createHttpEntity(requestBody),
+//                ApiResponseDto.class
+//        );
+//
+//        return response.getBody();
+//    }
 
     /**
      * AUTHORIZATION: Get new Authorization responses (GET /api/Authorization/GetNew)
      */
-    public ApiResponseDto getNewAuthorization() {
-        String url = properties.getBaseUrl() + "/api/Authorization/GetNew";
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                createHttpEntity(),
-                ApiResponseDto.class
-        );
-
-        return response.getBody();
-    }
+//    public ApiResponseDto getNewAuthorization() {
+//        String url = properties.getBaseUrl() + "/api/Authorization/GetNew";
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url,
+//                HttpMethod.GET,
+//                createHttpEntity(),
+//                ApiResponseDto.class
+//        );
+//
+//        return response.getBody();
+//    }
 
     /**
      * AUTHORIZATION: View specific Authorization transaction (GET /api/Authorization/View)
      */
-    public ApiResponseDto viewAuthorization(String transactionId, Integer direction) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(properties.getBaseUrl() + "/api/Authorization/View")
-                .queryParam("id", transactionId)
-                .queryParam("direction", direction != null ? direction : 0)
-                .build()
-                .toUriString();
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                createHttpEntity(),
-                ApiResponseDto.class
-        );
-
-        return response.getBody();
-    }
+//    public ApiResponseDto viewAuthorization(String transactionId, Integer direction) {
+//        String url = UriComponentsBuilder
+//                .fromHttpUrl(properties.getBaseUrl() + "/api/Authorization/View")
+//                .queryParam("id", transactionId)
+//                .queryParam("direction", direction != null ? direction : 0)
+//                .build()
+//                .toUriString();
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url,
+//                HttpMethod.GET,
+//                createHttpEntity(),
+//                ApiResponseDto.class
+//        );
+//
+//        return response.getBody();
+//    }
 
     /**
      * AUTHORIZATION: Mark Authorization as downloaded (POST /api/Authorization/SetDownloaded)
      */
-    public ApiResponseDto setAuthorizationDownloaded(String transactionId) {
-        String url = properties.getBaseUrl() + "/api/Authorization/SetDownloaded";
-
-        Map<String, String> body = Collections.singletonMap("id", transactionId);
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                createHttpEntity(body),
-                ApiResponseDto.class
-        );
-
-        return response.getBody();
-    }
+//    public ApiResponseDto setAuthorizationDownloaded(String transactionId) {
+//        String url = properties.getBaseUrl() + "/api/Authorization/SetDownloaded";
+//
+//        Map<String, String> body = Collections.singletonMap("id", transactionId);
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url,
+//                HttpMethod.POST,
+//                createHttpEntity(body),
+//                ApiResponseDto.class
+//        );
+//
+//        return response.getBody();
+//    }
 
 
 
     // ==================== ERX APIs ====================
 
-    public ApiResponseDto postErxRequest(Map<String, Object> requestBody) {
-        String url = properties.getBaseUrl() + "/api/ERX/PostRequest";
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto getNewErx() {
-        String url = properties.getBaseUrl() + "/api/ERX/GetNew";
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto viewErx(String transactionId, Integer direction) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(properties.getBaseUrl() + "/api/ERX/View")
-                .queryParam("id", transactionId)
-                .queryParam("direction", direction != null ? direction : 0)
-                .build().toUriString();
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto setErxDownloaded(String transactionId) {
-        String url = properties.getBaseUrl() + "/api/ERX/SetDownloaded";
-        Map<String, String> body = Collections.singletonMap("id", transactionId);
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
-        return response.getBody();
-    }
+//    public ApiResponseDto postErxRequest(Map<String, Object> requestBody) {
+//        String url = properties.getBaseUrl() + "/api/ERX/PostRequest";
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto getNewErx() {
+//        String url = properties.getBaseUrl() + "/api/ERX/GetNew";
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto viewErx(String transactionId, Integer direction) {
+//        String url = UriComponentsBuilder
+//                .fromHttpUrl(properties.getBaseUrl() + "/api/ERX/View")
+//                .queryParam("id", transactionId)
+//                .queryParam("direction", direction != null ? direction : 0)
+//                .build().toUriString();
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto setErxDownloaded(String transactionId) {
+//        String url = properties.getBaseUrl() + "/api/ERX/SetDownloaded";
+//        Map<String, String> body = Collections.singletonMap("id", transactionId);
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
+//        return response.getBody();
+//    }
 
     // ==================== DISPENSE APIs ====================
 
-    public ApiResponseDto getNewDispense() {
-        String url = properties.getBaseUrl() + "/api/Dispense/GetNew";
-
-        // Dispense GetNew requires type parameter
-        String fullUrl = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("type", "Prescription")
-                .build().toUriString();
-
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                fullUrl, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto viewDispense(String transactionId, Integer direction) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(properties.getBaseUrl() + "/api/Dispense/View")
-                .queryParam("id", transactionId)
-                .queryParam("direction", direction != null ? direction : 0)
-                .build().toUriString();
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto postErxDispense(Map<String, Object> requestBody) {
-        String url = properties.getBaseUrl() + "/api/Dispense/ErxDispense";
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto setDispenseDownloaded(String transactionId) {
-        String url = properties.getBaseUrl() + "/api/Dispense/SetDownloaded";
-        Map<String, String> body = new HashMap<>();
-        body.put("id", transactionId);
-        body.put("type", "Prescription");
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
-        return response.getBody();
-    }
+//    public ApiResponseDto getNewDispense() {
+//        String url = properties.getBaseUrl() + "/api/Dispense/GetNew";
+//
+//        // Dispense GetNew requires type parameter
+//        String fullUrl = UriComponentsBuilder.fromHttpUrl(url)
+//                .queryParam("type", "Prescription")
+//                .build().toUriString();
+//
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                fullUrl, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto viewDispense(String transactionId, Integer direction) {
+//        String url = UriComponentsBuilder
+//                .fromHttpUrl(properties.getBaseUrl() + "/api/Dispense/View")
+//                .queryParam("id", transactionId)
+//                .queryParam("direction", direction != null ? direction : 0)
+//                .build().toUriString();
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto postErxDispense(Map<String, Object> requestBody) {
+//        String url = properties.getBaseUrl() + "/api/Dispense/ErxDispense";
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto setDispenseDownloaded(String transactionId) {
+//        String url = properties.getBaseUrl() + "/api/Dispense/SetDownloaded";
+//        Map<String, String> body = new HashMap<>();
+//        body.put("id", transactionId);
+//        body.put("type", "Prescription");
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
+//        return response.getBody();
+//    }
 
 
     // ==================== PENALTY APIs ====================
 
-    public ApiResponseDto submitPenalty(Map<String, Object> requestBody) {
-        String url = properties.getBaseUrl() + "/api/Penalty/PenaltySubmission";
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto getNewPenalty() {
-        String url = properties.getBaseUrl() + "/api/Penalty/GetNew";
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto viewPenalty(String transactionId, Integer direction) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(properties.getBaseUrl() + "/api/Penalty/View")
-                .queryParam("id", transactionId)
-                .queryParam("direction", direction != null ? direction : 0)
-                .build().toUriString();
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
-        return response.getBody();
-    }
-
-    public ApiResponseDto setPenaltyDownloaded(String transactionId) {
-        String url = properties.getBaseUrl() + "/api/Penalty/SetDownloaded";
-        Map<String, String> body = Collections.singletonMap("id", transactionId);
-        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
-        return response.getBody();
-    }
+//    public ApiResponseDto submitPenalty(Map<String, Object> requestBody) {
+//        String url = properties.getBaseUrl() + "/api/Penalty/PenaltySubmission";
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(requestBody), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto getNewPenalty() {
+//        String url = properties.getBaseUrl() + "/api/Penalty/GetNew";
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto viewPenalty(String transactionId, Integer direction) {
+//        String url = UriComponentsBuilder
+//                .fromHttpUrl(properties.getBaseUrl() + "/api/Penalty/View")
+//                .queryParam("id", transactionId)
+//                .queryParam("direction", direction != null ? direction : 0)
+//                .build().toUriString();
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.GET, createHttpEntity(), ApiResponseDto.class);
+//        return response.getBody();
+//    }
+//
+//    public ApiResponseDto setPenaltyDownloaded(String transactionId) {
+//        String url = properties.getBaseUrl() + "/api/Penalty/SetDownloaded";
+//        Map<String, String> body = Collections.singletonMap("id", transactionId);
+//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+//                url, HttpMethod.POST, createHttpEntity(body), ApiResponseDto.class);
+//        return response.getBody();
+//    }
 
 
     /// Eligibility Modifications
@@ -569,5 +573,371 @@ public class RiayatiRestClient {
                 entity,
                 String.class);
 
+    }
+
+
+    // Authorization Modules
+
+    public String submitAuthorization(Object request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Authorization/PostRequest",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public GetNewResponse getNewAuthorization() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<GetNewResponse> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Authorization/GetNew",
+                HttpMethod.GET,
+                entity,
+                GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public AuthorizationResponse viewAuthorization(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/Authorization/View")
+                .queryParam("id", transactionId)
+                .queryParam("direction", 0)
+                .build()
+                .toUriString();
+
+        ResponseEntity<AuthorizationResponse> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                AuthorizationResponse.class);
+
+        return response.getBody();
+    }
+
+    public String setAuthorizationDownloaded(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        Map<String, String> body = Collections.singletonMap("id", transactionId);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Authorization/SetDownloaded",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public String getAuthorizationStatus(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/Authorization/View")
+                .queryParam("id", transactionId)
+                .queryParam("direction", 0)
+                .build()
+                .toUriString();
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+
+    // ==================== ERX APIs ====================
+
+    public String submitErx(Object request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/ERX/PostRequest",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public GetNewResponse getNewErx() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<GetNewResponse> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/ERX/GetNew",
+                HttpMethod.GET,
+                entity,
+                GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public ErxResponse viewErx(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/ERX/View")
+                .queryParam("id", transactionId)
+                .queryParam("direction", 0)
+                .build()
+                .toUriString();
+
+        ResponseEntity<ErxResponse> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                ErxResponse.class);
+
+        return response.getBody();
+    }
+
+    public String setErxDownloaded(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        Map<String, String> body = Collections.singletonMap("id", transactionId);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/ERX/SetDownloaded",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public String getErxStatus(String prescriptionId) {
+        // View ERX by prescription ID
+        // This may need to call View API with the transaction ID
+        // Or call CheckActivityStatus API
+        return "{\"status\":\"PENDING\"}";
+    }
+
+
+    // ==================== DISPENSE APIs ====================
+
+    public String submitDispense(Object request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Dispense/ErxDispense",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public GetNewResponse getNewDispense() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/Dispense/GetNew")
+                .queryParam("type", "Prescription")
+                .build()
+                .toUriString();
+
+        ResponseEntity<GetNewResponse> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public DispenseResponse viewDispense(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/Dispense/View")
+                .queryParam("id", transactionId)
+                .queryParam("direction", 0)
+                .build()
+                .toUriString();
+
+        ResponseEntity<DispenseResponse> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                DispenseResponse.class);
+
+        return response.getBody();
+    }
+
+    public String setDispenseDownloaded(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        Map<String, String> body = new HashMap<>();
+        body.put("id", transactionId);
+        body.put("type", "Prescription");
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Dispense/SetDownloaded",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public String getDispenseStatus(String dispenseId) {
+        // View dispense by ID
+        return "{\"status\":\"PENDING\"}";
+    }
+
+
+
+    // ==================== PENALTY APIs ====================
+
+    public String submitPenalty(Object request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Penalty/PenaltySubmission",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public GetNewResponse getNewPenalty() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<GetNewResponse> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Penalty/GetNew",
+                HttpMethod.GET,
+                entity,
+                GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public PenaltyResponse viewPenalty(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        String url = UriComponentsBuilder
+                .fromHttpUrl(properties.getBaseUrl() + "/api/Penalty/View")
+                .queryParam("id", transactionId)
+                .queryParam("direction", 0)
+                .build()
+                .toUriString();
+
+        ResponseEntity<PenaltyResponse> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                PenaltyResponse.class);
+
+        return response.getBody();
+    }
+
+    public String setPenaltyDownloaded(String transactionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        Map<String, String> body = Collections.singletonMap("id", transactionId);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = riayatiRestTemplate.exchange(
+                properties.getBaseUrl() + "/api/Penalty/SetDownloaded",
+                HttpMethod.POST,
+                entity,
+                String.class);
+
+        return response.getBody();
+    }
+
+    public String getPenaltyStatus(String claimId) {
+        // View penalty by claim ID
+        return "{\"status\":\"PENDING\"}";
     }
 }
