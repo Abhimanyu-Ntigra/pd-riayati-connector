@@ -1,5 +1,6 @@
 package com.ntigra.riayati_middleware.dto.request;
 
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.ObservationDto;
 import lombok.Data;
 import java.util.List;
 

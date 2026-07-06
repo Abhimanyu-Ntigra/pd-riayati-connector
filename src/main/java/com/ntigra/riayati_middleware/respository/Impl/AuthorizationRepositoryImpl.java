@@ -193,21 +193,21 @@ public class AuthorizationRepositoryImpl implements AuthorizationRepository {
 
     @Override
     public void updateAuthorizationAsSent(Long id, String entityId) {
-        String sql = "UPDATE PreAuthHead SET Status = 2, EntityId = ?, SentAt = GETDATE() WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET Status = 2, UpdatedAt = GETDATE(), ResponseIdentifier = ? WHERE Id = ?";
         jdbcTemplate.update(sql, entityId, id);
         log.info("Authorization {} marked as SENT with EntityId: {}", id, entityId);
     }
 
     @Override
     public void updateAuthorizationAsSentWithResponse(Long id, String entityId, String responseJson) {
-        String sql = "UPDATE PreAuthHead SET Status = 2, EntityId = ?, SentAt = GETDATE(), ResponseData = ? WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET Status = 2, UpdatedAt = GETDATE(), ResponseIdentifier = ?, ResponseComment = ? WHERE Id = ?";
         jdbcTemplate.update(sql, entityId, responseJson, id);
         log.info("Authorization {} marked as SENT with EntityId: {}", id, entityId);
     }
 
     @Override
     public void updateAuthorizationAsFailed(Long id, String errorMessage) {
-        String sql = "UPDATE PreAuthHead SET Status = 3, ErrorMessage = ? WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET Status = 8, UpdatedAt = GETDATE(), ResponseComment = ? WHERE Id = ?";
         jdbcTemplate.update(sql, errorMessage, id);
         log.error("Authorization {} marked as FAILED: {}", id, errorMessage);
     }
@@ -327,7 +327,7 @@ public class AuthorizationRepositoryImpl implements AuthorizationRepository {
 
     @Override
     public void updateBillStatus(String preAuthId) {
-        String sql = "UPDATE PreAuthHead SET BillStatus = 'PROCESSED' WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET ResponseComment = 'BILL_PROCESSED', UpdatedAt = GETDATE() WHERE Id = ?";
         jdbcTemplate.update(sql, preAuthId);
         log.info("Bill status updated for PreAuthId: {}", preAuthId);
     }

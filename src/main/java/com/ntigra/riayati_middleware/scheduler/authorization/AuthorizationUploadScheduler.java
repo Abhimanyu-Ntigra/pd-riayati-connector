@@ -1,6 +1,10 @@
 package com.ntigra.riayati_middleware.scheduler.authorization;
 
 import com.ntigra.riayati_middleware.client.RiayatiRestClient;
+import com.ntigra.riayati_middleware.dto.ApiResponseDto;
+import com.ntigra.riayati_middleware.dto.TransactionEntityDto;
+import com.ntigra.riayati_middleware.dto.polling.GetNewEntity;
+import com.ntigra.riayati_middleware.dto.polling.GetNewResponse;
 import com.ntigra.riayati_middleware.dto.request.AuthorizationRequestDto;
 import com.ntigra.riayati_middleware.respository.AuthorizationRepository;
 import com.ntigra.riayati_middleware.service.Authorization.AuthorizationServiceOld;
@@ -40,17 +44,17 @@ public class AuthorizationUploadScheduler {
 
         try {
             // STEP 1: First call GetNew to get pending transactions
-//            log.info("Calling GetNew to fetch pending authorization transactions...");
-//            ApiResponseDto getNewResponse = riayatiClient.getNewAuthorization();
-//
-//            if (getNewResponse != null && getNewResponse.getEntities() != null) {
-//                log.info("Found {} transactions in GetNew response", getNewResponse.getEntities().size());
-//                // Log the transaction IDs for reference
-//                for (TransactionEntityDto entity : getNewResponse.getEntities()) {
-//                    log.debug("GetNew transaction: ID={}, SenderID={}, TransactionDate={}",
-//                            entity.getId(), entity.getSenderId(), entity.getTransactionDate());
-//                }
-//            }
+            log.info("Calling GetNew to fetch pending authorization transactions...");
+            GetNewResponse getNewResponse = riayatiClient.getNewAuthorization();
+
+            if (getNewResponse != null && getNewResponse.getEntities() != null) {
+                log.info("Found {} transactions in GetNew response", getNewResponse.getEntities().size());
+                // Log the transaction IDs for reference
+                for (GetNewEntity entity : getNewResponse.getEntities()) {
+                    log.debug("GetNew transaction: ID={}, SenderID={}, TransactionDate={}",
+                            entity.getId(), entity.getSenderId(), entity.getTransactionDate());
+                }
+            }
 
             // STEP 2: Fetch pending authorization requests from database
             List<AuthorizationRequestDto> pendingRequests = authorizationRepository.fetchPendingAuthorizations();

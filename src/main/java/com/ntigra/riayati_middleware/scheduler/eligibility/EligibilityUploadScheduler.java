@@ -1,5 +1,8 @@
 package com.ntigra.riayati_middleware.scheduler.eligibility;
 
+import com.ntigra.riayati_middleware.client.RiayatiRestClient;
+import com.ntigra.riayati_middleware.dto.polling.GetNewEntity;
+import com.ntigra.riayati_middleware.dto.polling.GetNewResponse;
 import com.ntigra.riayati_middleware.dto.request.EligibilityRequestDto;
 import com.ntigra.riayati_middleware.respository.EligibilityRepository;
 import com.ntigra.riayati_middleware.service.Eligibility.EligibilityServiceOld;
@@ -17,14 +20,17 @@ import java.util.List;
 public class EligibilityUploadScheduler {
 
     private final ThreadPoolTaskExecutor eligibilityUploadTaskExecutor;
+    private final RiayatiRestClient riayatiClient;
     private final EligibilityRepository eligibilityRepository;
     private final EligibilityServiceOld eligibilityService;
 
     public EligibilityUploadScheduler(
             @Qualifier("eligibilityUploadTaskExecutor") ThreadPoolTaskExecutor eligibilityUploadTaskExecutor,
+            RiayatiRestClient riayatiClient,
             EligibilityRepository eligibilityRepository,
             EligibilityServiceOld eligibilityService) {
         this.eligibilityUploadTaskExecutor = eligibilityUploadTaskExecutor;
+        this.riayatiClient = riayatiClient;
         this.eligibilityRepository = eligibilityRepository;
         this.eligibilityService = eligibilityService;
     }
@@ -35,8 +41,18 @@ public class EligibilityUploadScheduler {
 
         try {
             // Step 1: Fetch pending eligibility requests from database
-            //List<EligibilityRequestDto> pendingRequests = eligibilityRepository.fetchPendingEligibilityRequests();
-            List<EligibilityRequestDto> pendingRequests = eligibilityRepository.getClaims();
+            GetNewResponse getNewResponse = riayatiClient.getNewEligibility();
+
+            if (getNewResponse != null && getNewResponse.getEntities() != null) {
+                log.info("Found {} transactions in GetNew response", getNewResponse.getEntities().size());
+                // Log the transaction IDs for reference
+                for (GetNewEntity entity : getNewResponse.getEntities()) {
+                    log.info("GetNew transaction: ID={}, SenderID={}, TransactionDate={}",
+                            entity.getId(), entity.getSenderId(), entity.getTransactionDate());
+                }
+            }
+
+            List<EligibilityRequestDto> pendingRequests = eligibilityRepository.fetchPendingEligibilityRequests();
 
             if (pendingRequests != null && !pendingRequests.isEmpty()) {
                 log.info("Found {} pending eligibility requests to upload", pendingRequests.size());

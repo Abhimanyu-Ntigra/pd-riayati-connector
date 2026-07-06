@@ -10,7 +10,6 @@ import com.ntigra.riayati_middleware.dto.request.AuthorizationRequestDto;
 import com.ntigra.riayati_middleware.dto.response.AuthorizationResponseDto;
 import com.ntigra.riayati_middleware.util.DateUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

@@ -10,6 +10,7 @@ public class ErxRequestDto {
     private String prescriptionId;      // PreAuthRef from PreAuthHead
     private String referenceNumber;
     private Integer retryCount;
+    private String requestReferenceNumber;
 
     // Header
     private String senderId;
@@ -29,6 +30,7 @@ public class ErxRequestDto {
     private String fullName;
     private String gender;
     private String dateOfBirth;
+    private String dateOrdered;
     private String contactNumber;
     private String email;
     private Double weight;

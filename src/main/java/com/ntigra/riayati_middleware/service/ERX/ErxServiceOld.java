@@ -32,97 +32,98 @@ public class ErxServiceOld {
 
     // ==================== UPLOAD METHODS ====================
 
-//    public ErxResponseDto sendErxRequest(ErxRequestDto request) {
-//        log.info("Sending ERX request: {}", request.getPrescriptionId());
-//
-//        try {
-//            // Upload attachment if present
-//            String attachmentId = null;
-//            if (request.getFileContent() != null && request.getFileContent().length > 0) {
-//                attachmentId = riayatiClient.uploadAttachment(
-//                        request.getFileContent(),
-//                        request.getFileName() != null ? request.getFileName() : "prescription.pdf"
-//                );
-//                log.info("Attachment uploaded with ID: {}", attachmentId);
-//            }
-//
-//            ErxSubmission submission = erxMapper.toErxSubmission(request, attachmentId);
-//
-//            Map<String, Object> apiRequest = new HashMap<>();
-//            Map<String, Object> erxRequestMap = new HashMap<>();
-//            erxRequestMap.put("Header", submission.getHeader());
-//            erxRequestMap.put("Prescription", submission.getPrescription());
-//            apiRequest.put("ErxRequest", erxRequestMap);
-//
-//            ApiResponseDto response = riayatiClient.postErxRequest(apiRequest);
-//            responseProcessor.validateUploadResponse(response);
-//
-//            String responseJson = objectMapper.writeValueAsString(response);
-//            erxRepository.updateErxAsSentWithResponse(
-//                    request.getId(), response.getEntityId(), response.getReferenceNumber(), responseJson
-//            );
-//
-//            log.info("ERX sent successfully: {}, EntityID: {}, ReferenceNumber: {}",
-//                    request.getPrescriptionId(), response.getEntityId(), response.getReferenceNumber());
-//
-//            return ErxResponseDto.builder()
-//                    .success(true)
-//                    .entityId(response.getEntityId())
-//                    .referenceNumber(response.getReferenceNumber())
-//                    .message(response.getMessage())
-//                    .build();
-//
-//        } catch (Exception e) {
-//            log.error("ERX request failed: {}", request.getPrescriptionId(), e);
-//            erxRepository.updateErxAsFailed(request.getId(), e.getMessage());
-//
-//            return ErxResponseDto.builder()
-//                    .success(false)
-//                    .errorMessage(e.getMessage())
-//                    .build();
-//        }
-//    }
-//
-//    public void submitErxInBackground(ErxRequestDto request) {
-//        log.info("Background ERX upload: {}", request.getPrescriptionId());
-//
-//        try {
-//            String attachmentId = null;
-//            if (request.getFileContent() != null && request.getFileContent().length > 0) {
-//                attachmentId = riayatiClient.uploadAttachment(
-//                        request.getFileContent(),
-//                        request.getFileName() != null ? request.getFileName() : "prescription.pdf"
-//                );
-//                log.info("Attachment uploaded with ID: {}", attachmentId);
-//            }
-//
-//            ErxSubmission submission = erxMapper.toErxSubmission(request, attachmentId);
-//
-//            Map<String, Object> apiRequest = new HashMap<>();
-//            Map<String, Object> erxRequestMap = new HashMap<>();
-//            erxRequestMap.put("Header", submission.getHeader());
-//            erxRequestMap.put("Prescription", submission.getPrescription());
-//            apiRequest.put("ErxRequest", erxRequestMap);
-//
-//            ApiResponseDto response = riayatiClient.postErxRequest(apiRequest);
-//            responseProcessor.validateUploadResponse(response);
-//
-//            String responseJson = objectMapper.writeValueAsString(response);
-//            erxRepository.updateErxAsSentWithResponse(
-//                    request.getId(), response.getEntityId(), response.getReferenceNumber(), responseJson
-//            );
-//
-//            log.info("Background ERX sent successfully: {}, EntityID: {}, ReferenceNumber: {}",
-//                    request.getPrescriptionId(), response.getEntityId(), response.getReferenceNumber());
-//
-//        } catch (Exception e) {
-//            log.error("Background ERX failed: {}", request.getPrescriptionId(), e);
-//            erxRepository.updateRetryCount(request.getId());
-//            if (request.getRetryCount() != null && request.getRetryCount() + 1 >= 3) {
-//                erxRepository.updateErxAsFailed(request.getId(), e.getMessage());
-//            }
-//        }
-//    }
+    public ErxResponseDto sendErxRequest(ErxRequestDto request) {
+        log.info("Sending ERX request: {}", request.getPrescriptionId());
+
+        try {
+            // Upload attachment if present
+            String attachmentId = null;
+            if (request.getFileContent() != null && request.getFileContent().length > 0) {
+                attachmentId = riayatiClient.uploadAttachment(
+                        request.getFileContent(),
+                        request.getFileName() != null ? request.getFileName() : "prescription.pdf"
+                );
+                log.info("Attachment uploaded with ID: {}", attachmentId);
+            }
+
+            ErxSubmission submission = erxMapper.toErxSubmission(request, attachmentId);
+
+            Map<String, Object> apiRequest = new HashMap<>();
+            Map<String, Object> erxRequestMap = new HashMap<>();
+            erxRequestMap.put("Header", submission.getHeader());
+            erxRequestMap.put("Prescription", submission.getPrescription());
+            apiRequest.put("ErxRequest", erxRequestMap);
+
+            ApiResponseDto response = riayatiClient.postErxRequest(apiRequest);
+            responseProcessor.validateUploadResponse(response);
+
+            String responseJson = objectMapper.writeValueAsString(response);
+            erxRepository.updateErxAsSentWithResponse(
+                    request.getId(), response.getEntityId(), response.getReferenceNumber(), responseJson
+            );
+
+            log.info("ERX sent successfully: {}, EntityID: {}, ReferenceNumber: {}",
+                    request.getPrescriptionId(), response.getEntityId(), response.getReferenceNumber());
+
+            return ErxResponseDto.builder()
+                    .success(true)
+                    .entityId(response.getEntityId())
+                    .referenceNumber(response.getReferenceNumber())
+                    .message(response.getMessage())
+                    .build();
+
+        } catch (Exception e) {
+            log.error("ERX request failed: {}", request.getPrescriptionId(), e);
+            erxRepository.updateErxAsFailed(request.getId(), e.getMessage());
+
+            return ErxResponseDto.builder()
+                    .success(false)
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
+    }
+
+    public void submitErxInBackground(ErxRequestDto request) {
+        log.info("Background ERX upload: {}", request.getPrescriptionId());
+
+        try {
+            String attachmentId = null;
+            if (request.getFileContent() != null && request.getFileContent().length > 0) {
+                attachmentId = riayatiClient.uploadAttachment(
+                        request.getFileContent(),
+                        request.getFileName() != null ? request.getFileName() : "prescription.pdf"
+                );
+                log.info("Attachment uploaded with ID: {}", attachmentId);
+            }
+
+            ErxSubmission submission = erxMapper.toErxSubmission(request, attachmentId);
+
+            Map<String, Object> apiRequest = new HashMap<>();
+            Map<String, Object> erxRequestMap = new HashMap<>();
+            erxRequestMap.put("Header", submission.getHeader());
+            erxRequestMap.put("Prescription", submission.getPrescription());
+            apiRequest.put("ErxRequest", erxRequestMap);
+
+            ApiResponseDto response = riayatiClient.postErxRequest(apiRequest);
+            responseProcessor.validateUploadResponse(response);
+
+            String responseJson = objectMapper.writeValueAsString(response);
+            erxRepository.updateErxAsSentWithResponse(
+                    request.getId(), response.getEntityId(), response.getReferenceNumber(), responseJson
+            );
+            // where to save response ??
+
+            log.info("Background ERX sent successfully: {}, EntityID: {}, ReferenceNumber: {}",
+                    request.getPrescriptionId(), response.getEntityId(), response.getReferenceNumber());
+
+        } catch (Exception e) {
+            log.error("Background ERX failed: {}", request.getPrescriptionId(), e);
+            erxRepository.updateRetryCount(request.getId());
+            if (request.getRetryCount() != null && request.getRetryCount() + 1 >= 3) {
+                erxRepository.updateErxAsFailed(request.getId(), e.getMessage());
+            }
+        }
+    }
 //
 //    // ==================== DOWNLOAD METHODS ====================
 //

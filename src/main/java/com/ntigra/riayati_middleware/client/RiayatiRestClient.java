@@ -293,18 +293,18 @@ public class RiayatiRestClient {
     /**
      * AUTHORIZATION: Send Authorization Request (POST /api/Authorization/PostRequest)
      */
-//    public ApiResponseDto postAuthorizationRequest(Map<String, Object> requestBody) {
-//        String url = properties.getBaseUrl() + "/api/Authorization/PostRequest";
-//
-//        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
-//                url,
-//                HttpMethod.POST,
-//                createHttpEntity(requestBody),
-//                ApiResponseDto.class
-//        );
-//
-//        return response.getBody();
-//    }
+    public ApiResponseDto postAuthorizationRequest(Map<String, Object> requestBody) {
+        String url = properties.getBaseUrl() + "/api/Authorization/PostRequest";
+
+        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                createHttpEntity(requestBody),
+                ApiResponseDto.class
+        );
+
+        return response.getBody();
+    }
 
     /**
      * AUTHORIZATION: Get new Authorization responses (GET /api/Authorization/GetNew)
@@ -711,6 +711,26 @@ public class RiayatiRestClient {
                 HttpMethod.GET,
                 entity,
                 GetNewResponse.class);
+
+        return response.getBody();
+    }
+
+    public ApiResponseDto postErxRequest(Map<String, Object> requestBody) {
+        String url = properties.getBaseUrl() + "/api/ERX/PostRequest";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("username", properties.getUsername());
+        headers.add("password", properties.getPassword());
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<ApiResponseDto> response = riayatiRestTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                ApiResponseDto.class
+        );
 
         return response.getBody();
     }

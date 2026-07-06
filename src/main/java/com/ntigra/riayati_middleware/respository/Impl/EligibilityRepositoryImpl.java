@@ -1,5 +1,6 @@
 package com.ntigra.riayati_middleware.respository.Impl;
 
+import com.ntigra.riayati_middleware.dto.request.Authorization.request.DiagnosisDto;
 import com.ntigra.riayati_middleware.dto.request.EligibilityActivityDto;
 import com.ntigra.riayati_middleware.dto.request.EligibilityRequestDto;
 import com.ntigra.riayati_middleware.respository.EligibilityRepository;
@@ -122,22 +123,22 @@ public class EligibilityRepositoryImpl implements EligibilityRepository {
 
     @Override
     public void updateEligibilityAsSent(Long id, String entityId) {
-        String sql = "UPDATE Eligibility SET Status = 'SENT', EntityId = ?, SentAt = GETDATE() WHERE Id = ?";
+        String sql = "UPDATE Eligibility SET Status = 'SENT', ResponseIdentifier = ?, UpdatedAt = GETDATE() WHERE Id = ?";
         jdbcTemplate.update(sql, entityId, id);
         log.info("Eligibility {} marked as SENT with EntityId: {}", id, entityId);
     }
 
     @Override
     public void updateEligibilityAsSentWithResponse(Long id, String entityId, String responseJson) {
-        String sql = "UPDATE Eligibility SET Status = 'SENT', EntityId = ?, SentAt = GETDATE(), ResponseData = ? WHERE Id = ?";
-        jdbcTemplate.update(sql, entityId, responseJson, id);
+        String sql = "UPDATE Eligibility SET Status = 'SENT', ResponseIdentifier = ?, UpdatedAt = GETDATE() WHERE Id = ?";
+        jdbcTemplate.update(sql, entityId, id);
         log.info("Eligibility {} marked as SENT with EntityId: {}", id, entityId);
     }
 
     @Override
     public void updateEligibilityAsFailed(Long id, String errorMessage) {
-        String sql = "UPDATE Eligibility SET Status = 'FAILED', ErrorMessage = ? WHERE Id = ?";
-        jdbcTemplate.update(sql, errorMessage, id);
+        String sql = "UPDATE Eligibility SET Status = 'FAILED', UpdatedAt = GETDATE() WHERE Id = ?";
+        jdbcTemplate.update(sql, id);
         log.error("Eligibility {} marked as FAILED: {}", id, errorMessage);
     }
 

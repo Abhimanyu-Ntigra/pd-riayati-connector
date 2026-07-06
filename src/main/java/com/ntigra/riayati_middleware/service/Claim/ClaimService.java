@@ -68,8 +68,9 @@ public class ClaimService {
             responseProcessor.validateUploadResponse(response);
 
             // Step 6: Update database with success
-            //String responseJson = objectMapper.writeValueAsString(response);
-            //claimRepository.updateClaimAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            String responseJson = objectMapper.writeValueAsString(response);
+            claimRepository.updateClaimAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            // where to save response ??
 
             log.info("Claim submitted successfully: {}, EntityID: {}", request.getClaimId(), response.getEntityId());
 
@@ -125,8 +126,9 @@ public class ClaimService {
             responseProcessor.validateUploadResponse(response);
 
             // Step 6: Update database with success
-            //String responseJson = objectMapper.writeValueAsString(response);
-            //claimRepository.updateClaimAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            String responseJson = objectMapper.writeValueAsString(response);
+            claimRepository.updateClaimAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            // where to save response ??
 
             log.info("Background claim uploaded successfully: {}, EntityID: {}", request.getClaimId(), response.getEntityId());
 
@@ -205,122 +207,115 @@ public class ClaimService {
 
     // ==================== DOWNLOAD METHODS ====================
 
-    public void processRemittanceInBackground(TransactionEntityDto transaction) {
-        log.info("Processing remittance for transaction: {}", transaction.getId());
-
-        try {
-            // Step 1: View full transaction details
-            ApiResponseDto viewResponse = riayatiClient.viewClaim(transaction.getId(), 0);
-            responseProcessor.validateDownloadResponse(viewResponse);
-
-            // Step 2: Parse the full response
-            RemittanceData remittanceData = parseRemittanceResponse(viewResponse);
-
-            // Step 3: Update database with payment info
-            if (remittanceData.getClaimId() != null) {
-                String remittanceJson = objectMapper.writeValueAsString(viewResponse);
-                /*claimRepository.updatePaymentInfo(
-                        remittanceData.getClaimId(),
-                        remittanceData.getTotalPaymentAmount(),
-                        remittanceData.getPaymentReference(),
-                        remittanceData.getDenialCode(),
-                        remittanceJson
-                );*/
-
-                claimRepository.updateRemittance(
-                        remittanceData.getClaimId(),
-                        remittanceData.getTotalPaymentAmount(),
-                        remittanceData.getDateSettlement(),
-                        remittanceData.getPaymentReference(),
-                        remittanceData.getPaymentReference(),
-                        remittanceData.getDenialCode()
-                );
-                log.info("Payment updated for claim: {}, amount: {}",
-                        remittanceData.getClaimId(), remittanceData.getTotalPaymentAmount());
-            }
-
-            // Step 4: Mark as downloaded in Riayati
-            riayatiClient.setClaimDownloaded(transaction.getId());
-
-            log.info("Remittance processed successfully: {}", transaction.getId());
-
-        } catch (Exception e) {
-            log.error("Failed to process remittance for transaction: {}", transaction.getId(), e);
-        }
-    }
+//    public void processRemittanceInBackground(TransactionEntityDto transaction) {
+//        log.info("Processing remittance for transaction: {}", transaction.getId());
+//
+//        try {
+//            // Step 1: View full transaction details
+//            ApiResponseDto viewResponse = riayatiClient.viewClaim(transaction.getId(), 0);
+//            responseProcessor.validateDownloadResponse(viewResponse);
+//
+//            // Step 2: Parse the full response
+//            RemittanceData remittanceData = parseRemittanceResponse(viewResponse);
+//
+//            // Step 3: Update database with payment info
+//            if (remittanceData.getClaimId() != null) {
+//                String remittanceJson = objectMapper.writeValueAsString(viewResponse);
+//
+//                claimRepository.updateRemittance(
+//                        remittanceData.getClaimId(),
+//                        remittanceData.getTotalPaymentAmount(),
+//                        remittanceData.getDateSettlement(),
+//                        remittanceData.getPaymentReference(),
+//                        remittanceData.getPaymentReference(),
+//                        remittanceData.getDenialCode()
+//                );
+//                log.info("Payment updated for claim: {}, amount: {}",
+//                        remittanceData.getClaimId(), remittanceData.getTotalPaymentAmount());
+//            }
+//
+//            // Step 4: Mark as downloaded in Riayati
+//            riayatiClient.setClaimDownloaded(transaction.getId());
+//
+//            log.info("Remittance processed successfully: {}", transaction.getId());
+//
+//        } catch (Exception e) {
+//            log.error("Failed to process remittance for transaction: {}", transaction.getId(), e);
+//        }
+//    }
 
     // ==================== HELPER METHODS - FULL PARSING ====================
 
     /**
      * Parse the full remittance response from Riayati
      */
-    private RemittanceData parseRemittanceResponse(ApiResponseDto response) {
-        RemittanceData data = new RemittanceData();
-
-        try {
-            // Convert response to JSON node for parsing
-            String responseJson = objectMapper.writeValueAsString(response);
-            JsonNode rootNode = objectMapper.readTree(responseJson);
-
-            // Navigate to Remittance → Claim
-            JsonNode entityNode = rootNode.path("Entity");
-            JsonNode remittanceNode = entityNode.path("Remittance");
-            JsonNode claimNode = remittanceNode.path("Claim");
-
-            // Parse Claim level fields
-            data.setClaimId(claimNode.path("ID").asText(null));
-            data.setIdPayer(claimNode.path("IDPayer").asText(null));
-            data.setProviderId(claimNode.path("ProviderID").asText(null));
-            data.setDenialCode(claimNode.path("DenialCode").asText(null));
-            data.setPaymentReference(claimNode.path("PaymentReference").asText(null));
-            data.setDateSettlement(claimNode.path("DateSettlement").asText(null));
-
-            // Parse Activities and calculate total payment
-            JsonNode activitiesNode = claimNode.path("Activity");
-            double totalPaymentAmount = 0.0;
-            double totalGross = 0.0;
-            double totalPatientShare = 0.0;
-
-            data.setActivityDetails(new ArrayList<ActivityDetail>());
-            if (activitiesNode.isArray()) {
-                for (JsonNode activity : activitiesNode) {
-                    double paymentAmount = activity.path("PaymentAmount").asDouble(0.0);
-                    double gross = activity.path("Gross").asDouble(0.0);
-                    double patientShare = activity.path("PatientShare").asDouble(0.0);
-
-                    totalPaymentAmount += paymentAmount;
-                    totalGross += gross;
-                    totalPatientShare += patientShare;
-
-                    ActivityDetail activityDetail = new ActivityDetail();
-                    activityDetail.setPaymentAmount(activity.path("PaymentAmount").asDouble(0.0));
-                    activityDetail.setActivityId(activity.path("ID").asText(null));
-                    activityDetail.setCode(activity.path("Code").asText(null));
-                    activityDetail.setDenialCode(activity.path("DenialCode").asText(null));
-                    activityDetail.setCode(activity.path("Comments").asText(null));
-
-                    data.getActivityDetails().add(activityDetail);
-                    // Store activity level details if needed
-//                    data.addActivityDetail(
-//                            activity.path("ID").asText(null),
-//                            activity.path("Code").asText(null),
-//                            paymentAmount,
-//                            activity.path("DenialCode").asText(null)
-//                    );
-                }
-            }
-
-            data.setTotalPaymentAmount(totalPaymentAmount);
-            data.setTotalGross(totalGross);
-            data.setTotalPatientShare(totalPatientShare);
-
-            log.info("Parsed remittance: ClaimId={}, TotalPayment={}, Activities={}",
-                    data.getClaimId(), totalPaymentAmount, activitiesNode.size());
-
-        } catch (Exception e) {
-            log.error("Error parsing remittance response", e);
-        }
-
-        return data;
-    }
+//    private RemittanceData parseRemittanceResponse(ApiResponseDto response) {
+//        RemittanceData data = new RemittanceData();
+//
+//        try {
+//            // Convert response to JSON node for parsing
+//            String responseJson = objectMapper.writeValueAsString(response);
+//            JsonNode rootNode = objectMapper.readTree(responseJson);
+//
+//            // Navigate to Remittance → Claim
+//            JsonNode entityNode = rootNode.path("Entity");
+//            JsonNode remittanceNode = entityNode.path("Remittance");
+//            JsonNode claimNode = remittanceNode.path("Claim");
+//
+//            // Parse Claim level fields
+//            data.setClaimId(claimNode.path("ID").asText(null));
+//            data.setIdPayer(claimNode.path("IDPayer").asText(null));
+//            data.setProviderId(claimNode.path("ProviderID").asText(null));
+//            data.setDenialCode(claimNode.path("DenialCode").asText(null));
+//            data.setPaymentReference(claimNode.path("PaymentReference").asText(null));
+//            data.setDateSettlement(claimNode.path("DateSettlement").asText(null));
+//
+//            // Parse Activities and calculate total payment
+//            JsonNode activitiesNode = claimNode.path("Activity");
+//            double totalPaymentAmount = 0.0;
+//            double totalGross = 0.0;
+//            double totalPatientShare = 0.0;
+//
+//            data.setActivityDetails(new ArrayList<ActivityDetail>());
+//            if (activitiesNode.isArray()) {
+//                for (JsonNode activity : activitiesNode) {
+//                    double paymentAmount = activity.path("PaymentAmount").asDouble(0.0);
+//                    double gross = activity.path("Gross").asDouble(0.0);
+//                    double patientShare = activity.path("PatientShare").asDouble(0.0);
+//
+//                    totalPaymentAmount += paymentAmount;
+//                    totalGross += gross;
+//                    totalPatientShare += patientShare;
+//
+//                    ActivityDetail activityDetail = new ActivityDetail();
+//                    activityDetail.setPaymentAmount(activity.path("PaymentAmount").asDouble(0.0));
+//                    activityDetail.setActivityId(activity.path("ID").asText(null));
+//                    activityDetail.setCode(activity.path("Code").asText(null));
+//                    activityDetail.setDenialCode(activity.path("DenialCode").asText(null));
+//                    activityDetail.setCode(activity.path("Comments").asText(null));
+//
+//                    data.getActivityDetails().add(activityDetail);
+//                    // Store activity level details if needed
+////                    data.addActivityDetail(
+////                            activity.path("ID").asText(null),
+////                            activity.path("Code").asText(null),
+////                            paymentAmount,
+////                            activity.path("DenialCode").asText(null)
+////                    );
+//                }
+//            }
+//
+//            data.setTotalPaymentAmount(totalPaymentAmount);
+//            data.setTotalGross(totalGross);
+//            data.setTotalPatientShare(totalPatientShare);
+//
+//            log.info("Parsed remittance: ClaimId={}, TotalPayment={}, Activities={}",
+//                    data.getClaimId(), totalPaymentAmount, activitiesNode.size());
+//
+//        } catch (Exception e) {
+//            log.error("Error parsing remittance response", e);
+//        }
+//
+//        return data;
+//    }
 }

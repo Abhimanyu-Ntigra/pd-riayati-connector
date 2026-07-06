@@ -27,70 +27,117 @@ public class ErxRepositoryImpl implements ErxRepository {
     public List<ErxRequestDto> fetchPendingErxRequests() {
         String sql =
                 "SELECT " +
-                        "    PH.Id AS erxId, " +
-                        "    PH.PreAuthRef AS prescriptionId, " +
-                        "    PH.CreatedAt AS createdAt, " +
-                        "    PH.RetryCount AS retryCount, " +
+                        "    CAST(PH.PreAuthRef AS VARCHAR(36)) AS PreAuthRef, " +
+                        "    CAST(PH.Id AS VARCHAR(36)) AS preAuthHeadId, " +
+                        "    CAST(PH.PatientVisitId AS VARCHAR(36)) AS visitId, " +
+                        "    PH.ParentAuthRef AS ParentAuthRef, " +
+                        "    PH.CreatedAt AS authorizationCreatedAt, " +
+                        "    PH.Status AS status, " +
+                        "    PH.IsProceed AS isProceed, " +
+                        "    PH.PollingAttempts AS retryCount, " +
+                        "    PH.SenderId AS SenderId, " +
                         "    " +
-                        "    PID.MemberId AS memberId, " +
-                        "    P.NationalId AS emiratesId, " +
-                        "    P.FirstName + ' ' + P.LastName AS fullName, " +
+                        "    PV.VisitNo AS VisitNo, " +
+                        "    PV.IsNewborn AS IsNewborn, " +
+                        "    PV.EncounterStartTime AS EncounterStartTime, " +
+                        "    ISNULL(PV.EncounterEndTime, PV.EncounterStartTime) AS EncounterEndTime, " +
+                        "    PV.EncounterType AS encounterType, " +
+                        "    " +
+                        "    P.FirstName AS firstName, " +
+                        "    P.LastName AS lastName, " +
+                        "    P.NationalId AS EmiratesIDNumber, " +
                         "    P.Gender AS gender, " +
-                        "    P.DOB AS dateOfBirth, " +
-                        "    P.Mobile AS contactNumber, " +
+                        "    P.DOB AS birthDate, " +
+                        "    P.Mobile AS mobile, " +
                         "    P.Email AS email, " +
                         "    " +
-                        "    CM.LicenseNo AS senderLicense, " +
-                        "    CM.LicenseNo AS facilityLicense, " +
-                        "    " +
-                        "    PV.EncounterType AS encounterType, " +
-                        "    PV.EncounterStartTime AS encounterStart, " +
-                        "    PV.EncounterEndTime AS encounterEnd " +
+                        "    PM.ItemSequenceNo AS activityId, " +
+                        "    PM.DrugCode AS code, " +
+                        "    PM.Quantity AS quantity, " +
+                        "    PM.DaysSupply AS duration, " +
+                        "    PM.Unit AS unitId, " +
+                        "    PM.OrderingDate AS startDate, " +
+                        "    PM.OrderType AS instructions " +
                         "FROM PreAuthHead PH " +
                         "INNER JOIN PatientVisits PV ON PV.Id = PH.PatientVisitId " +
                         "INNER JOIN Patients P ON P.Id = PV.PatientId " +
-                        "LEFT JOIN ClientMaster CM ON CM.Id = PH.SenderId " +
-                        "LEFT JOIN PatientInsuranceDetails PID ON PID.Id = PV.PatientInsuranceId " +
+                        "LEFT JOIN PreAuthMedications PM ON PM.PreAuthId = PH.Id " +
                         "WHERE PH.Status = 1 " +
                         "  AND ISNULL(PH.IsDeleted, 0) = 0 " +
                         "ORDER BY PH.CreatedAt ASC";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             ErxRequestDto dto = new ErxRequestDto();
-            dto.setId(rs.getLong("erxId"));
-            dto.setPrescriptionId(rs.getString("prescriptionId"));
-            dto.setRetryCount(rs.getInt("retryCount"));
 
-            dto.setMemberId(rs.getString("memberId"));
-            dto.setEmiratesId(rs.getString("emiratesId"));
-            dto.setFullName(rs.getString("fullName"));
+            // ========== FROM PREAUTHHEAD ==========
+            dto.setId(rs.getLong("preAuthHeadId"));
+            dto.setPrescriptionId(rs.getString("PreAuthRef"));
+            dto.setRequestReferenceNumber(rs.getString("ParentAuthRef"));
+            dto.setDateOrdered(rs.getString("authorizationCreatedAt"));
+            dto.setRetryCount(rs.getInt("retryCount"));
+            dto.setSenderId(rs.getString("SenderId"));
+            dto.setFacilityId(rs.getString("SenderId"));
+
+            // ========== FROM PATIENTVISITS ==========
+            dto.setEncounterType(rs.getInt("encounterType"));
+            dto.setEncounterStart(rs.getString("EncounterStartTime"));
+            dto.setEncounterEnd(rs.getString("EncounterEndTime"));
+
+            // ========== FROM PATIENTS ==========
+            String firstName = rs.getString("firstName");
+            String lastName = rs.getString("lastName");
+            dto.setFullName((firstName != null ? firstName : "") + " " + (lastName != null ? lastName : ""));
+            dto.setEmiratesId(rs.getString("EmiratesIDNumber"));
             dto.setGender(rs.getString("gender") != null ? rs.getString("gender") : "Male");
-            dto.setDateOfBirth(rs.getString("dateOfBirth"));
-            dto.setContactNumber(rs.getString("contactNumber"));
+            dto.setDateOfBirth(rs.getString("birthDate"));
+            dto.setContactNumber(rs.getString("mobile"));
             dto.setEmail(rs.getString("email"));
 
-            dto.setSenderId(rs.getString("senderLicense"));
-            dto.setFacilityId(rs.getString("facilityLicense"));
-
-            Integer encounterType = rs.getInt("encounterType");
-            dto.setEncounterType(rs.wasNull() ? 1 : encounterType);
-            dto.setEncounterStart(rs.getString("encounterStart"));
-            dto.setEncounterEnd(rs.getString("encounterEnd"));
-
-            // Constants
+            // ========== CONSTANTS ==========
+            dto.setMemberId("CONSTANT_MEMBER_ID");
+            dto.setWeight(50.0);
             dto.setReceiverId("PAYER_LICENSE_ID");
             dto.setPayerId("PAYER_LICENSE_ID");
             dto.setDispositionFlag("PRODUCTION");
             dto.setRecordCount(1);
             dto.setClinician("CONSTANT_CLINICIAN");
             dto.setTransactionType("eRxRequest");
-            dto.setWeight(50.0);
 
-            // Fetch diagnoses (reuse from PreAuthDiagnosis)
-            dto.setDiagnoses(fetchDiagnoses(dto.getPrescriptionId()));
+            // ========== DIAGNOSIS - USING CONSTANTS FROM SAMPLE JSON ==========
+            List<DiagnosisDto> diagnoses = new ArrayList<>();
+            DiagnosisDto diag = new DiagnosisDto();
+            diag.setType("Principal");
+            diag.setCode("R12");
+            diagnoses.add(diag);
+            dto.setDiagnoses(diagnoses);
 
-            // Fetch activities (reuse from PreAuthOrders)
-            dto.setActivities(fetchActivities(dto.getPrescriptionId()));
+            // ========== ACTIVITIES ==========
+            List<ErxActivityDto> activities = new ArrayList<>();
+            String activityId = rs.getString("activityId");
+            if (activityId != null) {
+                ErxActivityDto activity = new ErxActivityDto();
+                activity.setId(activityId);
+                activity.setType("5");
+                activity.setCode(rs.getString("code"));
+                activity.setQuantity(rs.getDouble("quantity"));
+                activity.setDuration(rs.getDouble("duration"));
+                activity.setUnitId(rs.getInt("unitId"));
+                activity.setRefills(0);
+                activity.setRouteOfAdmin("001");
+                activity.setInstructions(rs.getString("instructions"));
+                activity.setStart(rs.getString("startDate"));
+
+                // Additional constants
+                activity.setActivityReference("12451242");
+                activity.setDispensedQuantity("15.00");
+                activity.setLocation("3");
+                activity.setPerformerName("Performer name");
+                activity.setAuthorizationId("34589435");
+                activity.setComments("Test Comment Example");
+
+                activities.add(activity);
+            }
+            dto.setActivities(activities);
 
             return dto;
         });
@@ -138,25 +185,27 @@ public class ErxRepositoryImpl implements ErxRepository {
 
     @Override
     public void updateErxAsSent(Long id, String entityId, String referenceNumber) {
-        String sql = "UPDATE PreAuthHead SET Status = 2, EntityId = ?, ReferenceNumber = ?, SentAt = GETDATE() WHERE Id = ?";
-        jdbcTemplate.update(sql, entityId, referenceNumber, id);
+        String sql = "UPDATE PreAuthHead SET Status = 2, UpdatedAt = GETDATE() WHERE Id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
     public void updateErxAsSentWithResponse(Long id, String entityId, String referenceNumber, String responseJson) {
-        String sql = "UPDATE PreAuthHead SET Status = 2, EntityId = ?, ReferenceNumber = ?, SentAt = GETDATE(), ResponseData = ? WHERE Id = ?";
-        jdbcTemplate.update(sql, entityId, referenceNumber, responseJson, id);
+        String sql = "UPDATE PreAuthHead SET Status = 2, UpdatedAt = GETDATE(), PreAuthRef = ?, ResponseIdentifier = ?, ResponseComment = ? WHERE Id = ?";
+        jdbcTemplate.update(sql, referenceNumber, entityId, responseJson, id);
+        log.info("ERX marked as SENT for ID: {}, ReferenceNumber: {}, EntityID: {}", id, referenceNumber, entityId);
     }
 
     @Override
     public void updateErxAsFailed(Long id, String errorMessage) {
-        String sql = "UPDATE PreAuthHead SET Status = 3, ErrorMessage = ? WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET Status = 8, UpdatedAt = GETDATE(), ResponseComment = ? WHERE Id = ?";
         jdbcTemplate.update(sql, errorMessage, id);
+        log.error("ERX marked as FAILED for ID: {}, Error: {}", id, errorMessage);
     }
 
     @Override
     public void updateRetryCount(Long id) {
-        String sql = "UPDATE PreAuthHead SET RetryCount = ISNULL(RetryCount, 0) + 1 WHERE Id = ?";
+        String sql = "UPDATE PreAuthHead SET PollingAttempts = ISNULL(PollingAttempts, 0) + 1 WHERE Id = ?";
         jdbcTemplate.update(sql, id);
     }
 

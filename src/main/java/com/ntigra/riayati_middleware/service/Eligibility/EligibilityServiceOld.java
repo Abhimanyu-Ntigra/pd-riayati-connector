@@ -52,6 +52,7 @@ public class EligibilityServiceOld {
 
             String responseJson = objectMapper.writeValueAsString(response);
             eligibilityRepository.updateEligibilityAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            // where to save the response ??
 
             log.info("Eligibility check sent successfully: {}", request.getTransactionId());
 
@@ -92,6 +93,7 @@ public class EligibilityServiceOld {
 
             String responseJson = objectMapper.writeValueAsString(response);
             eligibilityRepository.updateEligibilityAsSentWithResponse(request.getId(), response.getEntityId(), responseJson);
+            // where to save the response ??
 
             log.info("Background eligibility sent successfully: {}", request.getTransactionId());
 
